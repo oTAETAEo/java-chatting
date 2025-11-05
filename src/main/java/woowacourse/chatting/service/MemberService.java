@@ -3,7 +3,7 @@ package woowacourse.chatting.service;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import woowacourse.chatting.Repositorty.MemberRepository;
+import woowacourse.chatting.repository.MemberRepository;
 import woowacourse.chatting.domain.Member;
 import woowacourse.chatting.dto.AddMemberRequest;
 
