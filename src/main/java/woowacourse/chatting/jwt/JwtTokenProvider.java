@@ -28,7 +28,7 @@ public class JwtTokenProvider {
     private final RefreshTokeService refreshTokeService;
 
     /**
-     * @param secretKey:<p> @Value("$jwt.secret")는 .yml에 저장 되어있는 key를 주입한다.
+     * @param secretKey:<p>      @Value("$jwt.secret")는 .yml에 저장 되어있는 key를 주입한다.
      * @param userDetailsService : <p>Spring Security의 표준 인터페이스를 통해 사용자 로드 기능을 주입받습니다.
      */
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, UserDetailsService userDetailsService, RefreshTokeService refreshTokeService) {
@@ -43,7 +43,7 @@ public class JwtTokenProvider {
      * <p>
      * 로그인이 끝났다는건 앞단에서 DB에 있는 데이터와 일치한걸 확인한 경우이다.
      */
-    public JwtToken generateToken(Authentication authentication){
+    public JwtToken generateToken(Authentication authentication) {
 
         // Authentication 객체에서 Member 정보 추출
         Member member = (Member) authentication.getPrincipal();
@@ -65,12 +65,12 @@ public class JwtTokenProvider {
                 .build();
     }
 
-    public Authentication getAuthentication(String accessToken){
+    public Authentication getAuthentication(String accessToken) {
 
         // 1. Jwt 토큰 복호화
         Claims claims = parseClaims(accessToken);
 
-        if(claims.get("auth") == null){
+        if (claims.get("auth") == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
@@ -121,6 +121,7 @@ public class JwtTokenProvider {
 
     /**
      * Member 객체는 UserDetails를 구현하고 있다. 이때 getAuthority() 메서드도 구현 하기 때문에 다형성으로 권한을 얻어올수 있다.
+     *
      * @param authentication
      * @return string : authority
      */

@@ -22,7 +22,7 @@ class MemberRepositoryTest {
 
         // given
         String testEmail = "test@woowacourse.com";
-        Member member = new Member(testEmail, "tae","qwertyuiop");
+        Member member = new Member(testEmail, "tae", "qwertyuiop");
         memberRepository.save(member); // DB에 저장
 
         // when

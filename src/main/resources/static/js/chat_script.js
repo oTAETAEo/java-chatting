@@ -23,7 +23,7 @@ function decodeJwt(token) {
         // Base64URL을 Base64로 변환하고, 패딩을 추가
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         // Base64 디코딩 및 URI 디코딩을 통해 JSON 문자열 획득
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
 

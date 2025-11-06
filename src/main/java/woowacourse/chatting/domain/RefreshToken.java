@@ -21,7 +21,7 @@ public class RefreshToken {
 
     private String token;
 
-    public void updateToken(String setToken){
+    public void updateToken(String setToken) {
         this.token = setToken;
     }
 

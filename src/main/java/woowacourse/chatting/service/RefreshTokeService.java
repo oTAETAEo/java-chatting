@@ -19,7 +19,7 @@ public class RefreshTokeService {
 
         Optional<RefreshToken> findToken = refreshTokeRepository.findById(memberId);
 
-        if (findToken.isPresent()){
+        if (findToken.isPresent()) {
 
             RefreshToken token = findToken.get();
             token.updateToken(refreshToken);
@@ -27,8 +27,8 @@ public class RefreshTokeService {
         }
 
         refreshTokeRepository.save(RefreshToken.builder()
-                        .memberId(memberId)
-                        .token(refreshToken)
+                .memberId(memberId)
+                .token(refreshToken)
                 .build());
     }
 }

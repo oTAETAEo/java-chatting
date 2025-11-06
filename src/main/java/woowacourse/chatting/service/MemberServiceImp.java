@@ -4,21 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import woowacourse.chatting.domain.Member;
+import woowacourse.chatting.dto.AddMemberRequest;
 import woowacourse.chatting.jwt.JwtToken;
 import woowacourse.chatting.jwt.JwtTokenProvider;
 import woowacourse.chatting.repository.MemberRepository;
-import woowacourse.chatting.domain.Member;
-import woowacourse.chatting.dto.AddMemberRequest;
 
 @Service
 @AllArgsConstructor
 @Slf4j
-public class MemberServiceImp implements MemberService{
+public class MemberServiceImp implements MemberService {
 
     private final MemberRepository memberRepository;
     private final AuthenticationManager authenticationManager;
@@ -32,11 +31,12 @@ public class MemberServiceImp implements MemberService{
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
+
         return jwtTokenProvider.generateToken(authenticate);
     }
 
     @Transactional
-    public Long save(AddMemberRequest dto){
+    public Long save(AddMemberRequest dto) {
         duplicateMember(dto);
 
         Member member = Member.builder()
