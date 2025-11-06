@@ -10,10 +10,10 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
-class MemberServiceTest {
+class MemberServiceImpTest {
 
     @Autowired
-    private MemberService memberService;
+    private MemberServiceImp memberServiceImp;
 
     @DisplayName("새로운 사용자 정보를 받아 회원을 저장하고, 저장된 회원의 ID를 반환한다.")
     @Test
@@ -22,7 +22,7 @@ class MemberServiceTest {
         AddMemberRequest request = new AddMemberRequest("test@test.com", "test", "test1234");
 
         // when
-        Long resultId = memberService.save(request);
+        Long resultId = memberServiceImp.save(request);
 
         // then
         assertThat(resultId).isEqualTo(1L);
@@ -36,10 +36,10 @@ class MemberServiceTest {
         AddMemberRequest duplicateRequest = new AddMemberRequest("test@test.com", "test", "test1234");
 
         // when
-        memberService.save(request);
+        memberServiceImp.save(request);
 
         // then
-        assertThatThrownBy(() -> memberService.save(duplicateRequest))
+        assertThatThrownBy(() -> memberServiceImp.save(duplicateRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
