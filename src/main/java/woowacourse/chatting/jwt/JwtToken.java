@@ -2,14 +2,13 @@ package woowacourse.chatting.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
 @Builder
-@Data
+@Getter
 @AllArgsConstructor
 public class JwtToken {
 
-    private String grantType;
-    private String accessToken;
-    private String refreshToken;
+    private final AccessToken accessToken;
+    private final RefreshToken refreshToken;
 }
