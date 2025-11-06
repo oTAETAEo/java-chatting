@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 채팅</title>
+    <link rel="stylesheet" href="./css/chat_style.css"> </head>
+<body>
+<div class="chat-container">
+    <h2>실시간 채팅방</h2>
+    <div id="chat-messages" class="messages-box">
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="username-input" placeholder="사용자 이름 (테스트용)" value="User-1" required>
+        <input type="text" id="message-input" placeholder="메시지 입력..." required>
+        <button id="send-button">전송</button>
+    </div>
+
+    <p id="status-message" class="status-info">연결 대기 중...</p>
+    <button id="disconnect-button" style="margin-top: 10px;">연결 끊기</button>
+</div>
+
+<script src="./js/chat_script.js"></script> </body>
+</html>
