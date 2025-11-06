@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,12 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import woowacourse.chatting.dto.AddMemberRequest;
 import woowacourse.chatting.dto.ResponseDto;
+import woowacourse.chatting.dto.ResponseToken;
 import woowacourse.chatting.dto.SignInDto;
 import woowacourse.chatting.jwt.JwtToken;
 import woowacourse.chatting.service.MemberServiceImp;
-
-import java.net.http.HttpResponse;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -35,21 +32,25 @@ public class MemberController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<?> singIn(@RequestBody SignInDto signInDto, HttpServletResponse response) {
+    public ResponseEntity<ResponseToken> singIn(@RequestBody SignInDto signInDto, HttpServletResponse response) {
         JwtToken jwtToken = memberServiceImp.singIn(signInDto.getEmail(), signInDto.getPassword());
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", jwtToken.getRefreshToken().getToken())
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", jwtToken.getRefreshToken())
                 .httpOnly(true)       // JS 접근 불가
                 .secure(false)         // HTTP 환경에서도 전송,
                 .sameSite("Lax")      // CSRF 방지
-                .path("/auth/refresh") // 재발급 엔드포인트에만 전송되도록 경로 설정
+                .path("/jwt/refresh") // 재발급 엔드포인트에만 전송되도록 경로 설정
                 .maxAge(86400 * 30)   // 쿠키 만료 시간 (예: 30일)
                 .build();
 
-        // 3. 응답 헤더에 쿠키 추가
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-        return ResponseEntity.ok(jwtToken.getAccessToken());
+        return ResponseEntity.ok(
+                ResponseToken.builder()
+                        .grantType(jwtToken.getGrantType())
+                        .accessToken(jwtToken.getAccessToken())
+                        .build()
+        );
     }
 
     @GetMapping("/test")
