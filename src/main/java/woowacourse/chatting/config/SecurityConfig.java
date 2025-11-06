@@ -1,17 +1,26 @@
 package woowacourse.chatting.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import woowacourse.chatting.jwt.JwtAuthenticationFilter;
+import woowacourse.chatting.jwt.JwtTokenProvider;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * Spring Security의 Filter Chain을 설정하고 반환합니다.
@@ -41,7 +50,9 @@ public class SecurityConfig {
                         ).permitAll()
 
                         // H2 콘솔, 회원가입, 루트 경로는 인증 없이 접근 허용
-                        .requestMatchers("/", "/signUp").permitAll()
+                        .requestMatchers(
+                                "/", "/sign-up", "/sign-in"
+                        ).permitAll()
 
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
                         // 그 외 모든 요청은 반드시 인증(로그인) 필요
@@ -52,7 +63,10 @@ public class SecurityConfig {
                 // H2 콘솔은 프레임을 사용하므로, 같은 출처(Same Origin) 내의 프레임 삽입만 허용합니다.
                 .headers((headers) -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                );
+                )
+
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+        ;
 
         return http.build();
     }
@@ -60,5 +74,10 @@ public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }
