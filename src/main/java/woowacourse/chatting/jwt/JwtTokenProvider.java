@@ -170,7 +170,7 @@ public class JwtTokenProvider {
                 .claim("auth", authorities)
                 .claim("memberId", member.getId())
                 .claim("name", member.getName())
-                .expiration(new Date(getNow() + 5000))
+                .expiration(new Date(getNow() + 3000000))
                 .signWith(key)
                 .compact();
     }
