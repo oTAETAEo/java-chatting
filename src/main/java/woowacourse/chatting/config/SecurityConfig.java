@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import woowacourse.chatting.jwt.JwtAuthenticationEntryPoint;
@@ -48,12 +48,12 @@ public class SecurityConfig {
                                 "/js/**",       // JavaScript 파일 허용
                                 "/images/**",   // 이미지 파일 허용 (있다면)
                                 "/*.html",      // 루트에 있는 HTML 파일 (예: index.html) 허용
-                                "/favicon.ico"  // 파비콘 허용
+                                "/favicon.ico" // 파비콘 허용
                         ).permitAll()
 
                         // H2 콘솔, 회원가입, 루트 경로는 인증 없이 접근 허용
                         .requestMatchers(
-                                "/", "/sign-up", "/sign-in"
+                                "/", "/sign-up", "/sign-in", "/jwt/refresh"
                         ).permitAll()
 
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
@@ -72,9 +72,16 @@ public class SecurityConfig {
                 )
 
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+
         ;
 
         return http.build();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .requestMatchers("/jwt/refresh");
     }
 
     @Bean
