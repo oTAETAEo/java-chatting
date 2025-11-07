@@ -41,7 +41,7 @@ public class MemberController {
                 .httpOnly(true)       // JS 접근 불가
                 .secure(false)         // HTTP 환경에서도 전송,
                 .sameSite("Lax")      // CSRF 방지
-                .path("/") // 재발급 엔드포인트에만 전송되도록 경로 설정
+                .path("/jwt/refresh")
                 .maxAge(86400 * 30)   // 쿠키 만료 시간 (예: 30일)
                 .build();
 
