@@ -14,25 +14,21 @@ import woowacourse.chatting.jwt.JwtToken;
 import woowacourse.chatting.jwt.JwtTokenProvider;
 import woowacourse.chatting.repository.MemberRepository;
 
+import java.util.NoSuchElementException;
+
 @Service
 @AllArgsConstructor
 @Slf4j
 public class MemberServiceImp implements MemberService {
 
     private final MemberRepository memberRepository;
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider;
-
     private final BCryptPasswordEncoder encoder;
-
-    @Transactional
+    
     @Override
-    public JwtToken singIn(String email, String password) {
+    public Member findMember(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자 입니다."));
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
-        Authentication authenticate = authenticationManager.authenticate(authenticationToken);
-
-        return jwtTokenProvider.generateToken(authenticate);
     }
 
     @Transactional

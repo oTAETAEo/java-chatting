@@ -16,6 +16,7 @@ import woowacourse.chatting.dto.ResponseDto;
 import woowacourse.chatting.dto.ResponseToken;
 import woowacourse.chatting.dto.SignInDto;
 import woowacourse.chatting.jwt.JwtToken;
+import woowacourse.chatting.service.AuthService;
 import woowacourse.chatting.service.MemberServiceImp;
 
 @Slf4j
@@ -24,6 +25,7 @@ import woowacourse.chatting.service.MemberServiceImp;
 public class MemberController {
 
     private final MemberServiceImp memberServiceImp;
+    private final AuthService authService;
 
     @PostMapping("/sign-up")
     public ResponseEntity<ResponseDto> memberSignUp(@Validated @RequestBody AddMemberRequest dto) {
@@ -33,13 +35,13 @@ public class MemberController {
 
     @PostMapping("/sign-in")
     public ResponseEntity<ResponseToken> singIn(@RequestBody SignInDto signInDto, HttpServletResponse response) {
-        JwtToken jwtToken = memberServiceImp.singIn(signInDto.getEmail(), signInDto.getPassword());
+        JwtToken jwtToken = authService.singIn(signInDto);
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", jwtToken.getRefreshToken())
                 .httpOnly(true)       // JS 접근 불가
                 .secure(false)         // HTTP 환경에서도 전송,
                 .sameSite("Lax")      // CSRF 방지
-                .path("/jwt/refresh") // 재발급 엔드포인트에만 전송되도록 경로 설정
+                .path("/") // 재발급 엔드포인트에만 전송되도록 경로 설정
                 .maxAge(86400 * 30)   // 쿠키 만료 시간 (예: 30일)
                 .build();
 

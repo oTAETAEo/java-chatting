@@ -1,9 +1,10 @@
 package woowacourse.chatting.service;
 
-import woowacourse.chatting.jwt.JwtToken;
+import woowacourse.chatting.domain.Member;
+
 
 public interface MemberService {
 
-    JwtToken singIn(String email, String password);
+    Member findMember (Long memberId);
 
 }
