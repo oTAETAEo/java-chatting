@@ -44,6 +44,55 @@ function displayMessage(user, message) {
     messageBox.scrollTop = messageBox.scrollHeight;
 }
 
+// --- API 요청 및 자동 토큰 재발급을 위한 fetch 래퍼 함수 ---
+async function fetchWithAuth(url, options) {
+    // 1. 현재 토큰으로 API 요청 시도
+    let response = await fetch(url, options);
+
+    // 2. 토큰 만료(401) 응답을 받으면 토큰 재발급 및 재시도
+    if (response.status === 401) {
+        console.log("[Auth] 401 Unauthorized. 토큰 재발급을 시도합니다.");
+
+        try {
+            // 2-1. 토큰 재발급 API 호출 (/jwt/refresh)
+            const refreshResponse = await fetch('/jwt/refresh', {
+                method: 'GET', // 컨트롤러가 GET으로 설정되어 있음
+            });
+
+            if (!refreshResponse.ok) {
+                throw new Error('토큰 재발급에 실패했습니다.');
+            }
+
+            const tokenData = await refreshResponse.json();
+            const newAccessToken = tokenData.accessToken;
+            const newGrantType = tokenData.grantType;
+
+            // 2-2. 새로운 토큰을 localStorage에 저장
+            localStorage.setItem('accessToken', newAccessToken);
+            localStorage.setItem('grantType', newGrantType);
+            console.log("[Auth] 새로운 액세스 토큰을 발급받아 저장했습니다.");
+
+            // 2-3. 기존 요청의 헤더를 새 토큰으로 교체
+            const newOptions = { ...options };
+            newOptions.headers['Authorization'] = `${newGrantType} ${newAccessToken}`;
+
+            // 2-4. 원래 요청을 재시도
+            console.log("[Auth] 새로운 토큰으로 원래 요청을 재시도합니다.");
+            response = await fetch(url, newOptions);
+
+        } catch (error) {
+            console.error("[Auth] 토큰 재발급 과정에서 오류가 발생했습니다:", error);
+            // 재발급 실패 시 로그인 페이지로 리다이렉트
+            window.location.href = 'index.html';
+            return response; 
+        }
+    }
+
+    // 3. 최종 응답 반환
+    return response;
+}
+
+
 // --- WebSocket 연결 및 초기화 함수 (모든 DOM 접근은 여기서 이루어집니다.) ---
 function connectWebSocket() {
     console.log('[Debug] connectWebSocket() 함수 실행 시작.');
@@ -168,7 +217,7 @@ function connectWebSocket() {
         }
 
         try {
-            const response = await fetch(API_URL, {
+            const response = await fetchWithAuth(API_URL, {
                 method: 'GET',
                 headers: {
                     'Authorization': `${grantType} ${accessToken}`
@@ -190,11 +239,6 @@ function connectWebSocket() {
                 if (apiResultMessage) {
                     apiResultMessage.textContent = `❌ API 실패 (${response.status}): ${displayError}`;
                     apiResultMessage.style.color = 'red';
-                }
-
-                if (response.status === 401) {
-                    console.error("[Debug] Authentication failed (401). Redirecting to index.html.");
-                    window.location.href = 'index.html';
                 }
             }
         } catch (error) {
