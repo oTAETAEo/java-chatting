@@ -14,14 +14,14 @@ import woowacourse.chatting.service.RefreshTokeService;
 import static woowacourse.chatting.jwt.JwtRole.GRANT_TYPE;
 
 @Slf4j
-@RestController("/jwt")
+@RestController()
 @RequiredArgsConstructor
 public class JwtController {
 
     private final RefreshTokeService refreshTokeService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @GetMapping("/refresh")
+    @GetMapping("/jwt/refresh")
     public ResponseEntity<ResponseToken> reissueAccessToken(HttpServletRequest request){
 
         Cookie refreshTokenCookie = refreshTokeService.findRefreshTokenCookieByName(request.getCookies());
