@@ -58,7 +58,7 @@ h2 {
 }
 
 #username-input {
-    flex-grow: 0.5; /* 사용자 이름은 메시지보다 작게 */
+    flex-grow: 0.5;
     width: 25%;
 }
 
@@ -79,4 +79,35 @@ h2 {
 .status-info {
     font-size: 0.9em;
     color: gray;
+    margin-top: 5px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#disconnect-button, #test-api-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    flex-grow: 1;
+}
+
+#disconnect-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+#test-api-button {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.api-result {
+    font-weight: bold;
+    margin-top: 10px;
 }

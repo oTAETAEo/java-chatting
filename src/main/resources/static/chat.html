@@ -13,13 +13,25 @@
     </div>
 
     <div class="input-area">
-        <input type="text" id="username-input" placeholder="사용자 이름 (테스트용)" value="User-1" required>
+        <!-- 이름은 토큰에서 추출되므로, disabled 처리하는 것이 좋습니다. -->
+        <input type="text" id="username-input" placeholder="사용자 이름 (토큰에서 추출됨)" required disabled>
         <input type="text" id="message-input" placeholder="메시지 입력..." required>
         <button id="send-button">전송</button>
     </div>
 
     <p id="status-message" class="status-info">연결 대기 중...</p>
-    <button id="disconnect-button" style="margin-top: 10px;">연결 끊기</button>
+
+    <!-- 🔥 버튼 컨테이너: 이 부분이 레이아웃 안정성을 높여 모든 버튼 클릭을 보장합니다. -->
+    <div class="action-buttons">
+        <button id="disconnect-button">연결 끊기</button>
+        <!-- type="submit"은 form 외부에선 의미 없지만, 명시적으로 남겨둠 -->
+        <button id="test-api-button">
+            /test GET 요청 (인증 필요)
+        </button>
+    </div>
+
+    <!-- 🔥 API 요청 결과 메시지를 표시할 영역 -->
+    <p id="api-result-message" class="status-info api-result"></p>
 </div>
 
 <script src="./js/chat_script.js"></script>

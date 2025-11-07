@@ -112,9 +112,9 @@ loginForm.addEventListener('submit', async (e) => {
             const result = await response.json();
 
             // 🔥🔥🔥 추가된 토큰 저장 로직 🔥🔥🔥
-            if (result.token) {
+            if (result.accessToken) {
                 // 'accessToken'이라는 키로 액세스 토큰 값을 localStorage에 저장
-                localStorage.setItem('accessToken', result.token);
+                localStorage.setItem('accessToken', result.accessToken);
                 // grantType (Bearer)도 필요하다면 함께 저장하여 나중에 사용
                 if (result.grantType) {
                     localStorage.setItem('grantType', result.grantType);
