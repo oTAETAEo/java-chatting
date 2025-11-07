@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import woowacourse.chatting.domain.RefreshToken;
 import woowacourse.chatting.repository.RefreshTokeRepository;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -31,4 +32,11 @@ public class RefreshTokeService {
                 .token(refreshToken)
                 .build());
     }
+
+    public RefreshToken findRefreshToken(Long memberId) {
+        return refreshTokeRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("리프래시 토큰을 찾을수 없습니다"));
+    }
+
+
 }
