@@ -1,5 +1,6 @@
 package woowacourse.chatting.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -13,9 +14,12 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import woowacourse.chatting.jwt.JwtAuthenticationEntryPoint;
 import woowacourse.chatting.jwt.filter.JwtAuthenticationFilter;
 import woowacourse.chatting.jwt.JwtTokenProvider;
+import woowacourse.chatting.jwt.filter.JwtLogoutFilter;
+import woowacourse.chatting.repository.RefreshTokeRepository;
 
 @Configuration
 @RequiredArgsConstructor
@@ -23,6 +27,8 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final RefreshTokeRepository refreshTokeRepository;
+    private final ObjectMapper objectMapper;
 
     /**
      * Spring Security의 Filter Chain을 설정하고 반환합니다.
@@ -31,17 +37,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // 1. CSRF(Cross-Site Request Forgery) 비활성화
+                // CSRF(Cross-Site Request Forgery) 비활성화
                 // REST API는 상태를 저장하지 않으므로(stateless), CSRF 공격에 대한 방어가 필요 없다.
                 // 세션을 사용하지 않고, 각 요청마다 인증 정보를 보내기 때문이다.
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // 2. 세션 관리 정책 설정
+                // logoutFilter 비활성화.
+                .logout(AbstractHttpConfigurer::disable)
+                .addFilterBefore(new JwtLogoutFilter(refreshTokeRepository, jwtTokenProvider, objectMapper), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), LogoutFilter.class)
+
+                // 세션 관리 정책 설정
                 // 세션을 사용하지 않고, 상태 없는(stateless) 인증을 사용하도록 설정한다.
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 3. 인가 설정: HTTP 요청에 대한 접근 권한 정의
+                // 인가 설정: HTTP 요청에 대한 접근 권한 정의
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(
                                 "/css/**",      // CSS 파일 허용
@@ -61,7 +72,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                // 4. X-Frame-Options 설정 (클릭재킹 방어)
+                // X-Frame-Options 설정 (클릭재킹 방어)
                 // H2 콘솔은 프레임을 사용하므로, 같은 출처(Same Origin) 내의 프레임 삽입만 허용합니다.
                 .headers((headers) -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
@@ -71,7 +82,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
 
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+
 
         ;
 
