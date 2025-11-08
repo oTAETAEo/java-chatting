@@ -22,7 +22,7 @@ public class RefreshTokeService {
 
     public void save(Long memberId, String refreshToken) {
 
-        Optional<RefreshToken> findToken = refreshTokeRepository.findById(memberId);
+        Optional<RefreshToken> findToken = refreshTokeRepository.findByMemberId(memberId);
 
         if (findToken.isPresent()) {
 
@@ -38,7 +38,7 @@ public class RefreshTokeService {
     }
 
     public RefreshToken findRefreshToken(Long memberId) {
-        return refreshTokeRepository.findById(memberId)
+        return refreshTokeRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new NoSuchElementException("리프래시 토큰을 찾을수 없습니다"));
     }
 
