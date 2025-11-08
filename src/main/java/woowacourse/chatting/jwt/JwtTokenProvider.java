@@ -34,8 +34,8 @@ public class JwtTokenProvider {
     private final MemberService memberService;
 
     /**
-     * @param secretKey:<p>      @Value("$jwt.secret")는 .yml에 저장 되어있는 key를 주입한다.
-     * @param userDetailsService : <p>Spring Security의 표준 인터페이스를 통해 사용자 로드 기능을 주입받습니다.
+     * @param secretKey: @Value("$jwt.secret")는 .yml에 저장 되어있는 key를 주입한다.
+     * @param userDetailsService : Spring Security의 표준 인터페이스를 통해 사용자 로드 기능을 주입받습니다.
      */
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, UserDetailsService userDetailsService, RefreshTokeService refreshTokeService, MemberService memberService) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -170,7 +170,7 @@ public class JwtTokenProvider {
                 .claim("auth", authorities)
                 .claim("memberId", member.getId())
                 .claim("name", member.getName())
-                .expiration(new Date(getNow() + 3000000))
+                .expiration(new Date(getNow() + 4000))
                 .signWith(key)
                 .compact();
     }

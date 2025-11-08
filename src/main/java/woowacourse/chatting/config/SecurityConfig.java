@@ -14,7 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import woowacourse.chatting.jwt.JwtAuthenticationEntryPoint;
-import woowacourse.chatting.jwt.JwtAuthenticationFilter;
+import woowacourse.chatting.jwt.filter.JwtAuthenticationFilter;
 import woowacourse.chatting.jwt.JwtTokenProvider;
 
 @Configuration
