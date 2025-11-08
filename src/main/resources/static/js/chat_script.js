@@ -105,6 +105,7 @@ function connectWebSocket() {
     const disconnectButton = document.getElementById('disconnect-button');
     const testApiButton = document.getElementById('test-api-button');
     const apiResultMessage = document.getElementById('api-result-message');
+    const logoutButton = document.getElementById('logout-button');
 
     // 필수 요소 검증
     if (!statusMessage || !messageInput || !usernameInput || !sendButton) {
@@ -251,6 +252,43 @@ function connectWebSocket() {
     }
 
 
+
+    // --- 로그아웃 함수 ---
+    async function logout() {
+        const accessToken = localStorage.getItem('accessToken');
+        const grantType = localStorage.getItem('grantType') || 'Bearer';
+
+        try {
+            const response = await fetchWithAuth('/logout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `${grantType} ${accessToken}`
+                }
+            });
+
+            if (response.ok) {
+                // 로컬 스토리지 클리어
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('grantType');
+                // 로그인 페이지로 리다이렉트
+                window.location.href = 'index.html';
+            } else {
+                console.error('Logout failed:', response.status);
+                // 실패 시에도 로컬 스토리지를 비우고 로그인 페이지로 이동
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('grantType');
+                window.location.href = 'index.html';
+            }
+        } catch (error) {
+            console.error('Error during logout:', error);
+            // 에러 발생 시에도 로컬 스토리지를 비우고 로그인 페이지로 이동
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('grantType');
+            window.location.href = 'index.html';
+        }
+    }
+
+
     // --- 이벤트 리스너 연결 ---
     console.log('[Debug] 이벤트 리스너를 연결합니다...');
     sendButton.addEventListener('click', sendMessage);
@@ -273,6 +311,14 @@ function connectWebSocket() {
         console.log('[Debug] "test-api-button"에 이벤트 리스너를 성공적으로 연결했습니다.');
     } else {
         console.error('[Debug] "test-api-button" 요소를 찾지 못해 이벤트 리스너를 연결할 수 없습니다.');
+    }
+
+    // 🔥 로그아웃 버튼 이벤트 리스너 연결
+    if (logoutButton) {
+        logoutButton.addEventListener('click', logout);
+        console.log('[Debug] "logout-button"에 이벤트 리스너를 성공적으로 연결했습니다.');
+    } else {
+        console.error('[Debug] "logout-button" 요소를 찾지 못해 이벤트 리스너를 연결할 수 없습니다.');
     }
 }
 

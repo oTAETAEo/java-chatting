@@ -88,7 +88,7 @@ h2 {
     margin-top: 10px;
 }
 
-#disconnect-button, #test-api-button {
+#disconnect-button, #test-api-button, #logout-button {
     padding: 10px 15px;
     border: none;
     border-radius: 4px;
@@ -97,9 +97,13 @@ h2 {
     flex-grow: 1;
 }
 
-#disconnect-button {
+#disconnect-button, #logout-button {
     background-color: #dc3545;
     color: white;
+}
+
+#logout-button:hover {
+    background-color: #c82333;
 }
 
 #test-api-button {
