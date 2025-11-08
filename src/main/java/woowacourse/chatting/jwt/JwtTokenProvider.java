@@ -3,6 +3,7 @@ package woowacourse.chatting.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import woowacourse.chatting.domain.Member;
 import woowacourse.chatting.domain.RefreshToken;
 import woowacourse.chatting.exception.jwt.JwtValidationException;
@@ -110,6 +112,18 @@ public class JwtTokenProvider {
         return getAccessToken(member, authorities);
     }
 
+    public String resolveAccessToken(HttpServletRequest request){
+
+        String accessToken = request.getHeader("Authorization");
+        log.info("logout Token : {}", accessToken);
+
+        if (StringUtils.hasText(accessToken) && accessToken.startsWith("Bearer ")){
+            return accessToken.substring(7);
+        }
+
+        return null;
+    }
+
     public void validateToken(String token) {
         try {
             Jwts.parser()
@@ -170,7 +184,7 @@ public class JwtTokenProvider {
                 .claim("auth", authorities)
                 .claim("memberId", member.getId())
                 .claim("name", member.getName())
-                .expiration(new Date(getNow() + 4000))
+                .expiration(new Date(getNow() + 5000))
                 .signWith(key)
                 .compact();
     }
