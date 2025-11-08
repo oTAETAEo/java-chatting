@@ -16,8 +16,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import woowacourse.chatting.jwt.JwtAuthenticationEntryPoint;
-import woowacourse.chatting.jwt.filter.JwtAuthenticationFilter;
 import woowacourse.chatting.jwt.JwtTokenProvider;
+import woowacourse.chatting.jwt.filter.JwtAuthenticationFilter;
 import woowacourse.chatting.jwt.filter.JwtLogoutFilter;
 import woowacourse.chatting.repository.RefreshTokeRepository;
 
@@ -81,7 +81,6 @@ public class SecurityConfig {
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
-
 
 
         ;

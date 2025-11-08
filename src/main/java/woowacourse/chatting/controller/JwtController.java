@@ -22,7 +22,7 @@ public class JwtController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping("/jwt/refresh")
-    public ResponseEntity<ResponseToken> reissueAccessToken(HttpServletRequest request){
+    public ResponseEntity<ResponseToken> reissueAccessToken(HttpServletRequest request) {
 
         Cookie refreshTokenCookie = refreshTokeService.findRefreshTokenCookieByName(request.getCookies());
         String refreshToken = refreshTokenCookie.getValue();

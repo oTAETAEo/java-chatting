@@ -2,16 +2,11 @@ package woowacourse.chatting.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woowacourse.chatting.domain.Member;
 import woowacourse.chatting.dto.AddMemberRequest;
-import woowacourse.chatting.jwt.JwtToken;
-import woowacourse.chatting.jwt.JwtTokenProvider;
 import woowacourse.chatting.repository.MemberRepository;
 
 import java.util.NoSuchElementException;
@@ -23,7 +18,7 @@ public class MemberServiceImp implements MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder encoder;
-    
+
     @Override
     public Member findMember(Long memberId) {
         return memberRepository.findById(memberId)

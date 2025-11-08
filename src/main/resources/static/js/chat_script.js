@@ -10,7 +10,7 @@ function decodeJwt(token) {
     try {
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
 
@@ -73,7 +73,7 @@ async function fetchWithAuth(url, options) {
             console.log("[Auth] 새로운 액세스 토큰을 발급받아 저장했습니다.");
 
             // 2-3. 기존 요청의 헤더를 새 토큰으로 교체
-            const newOptions = { ...options };
+            const newOptions = {...options};
             newOptions.headers['Authorization'] = `${newGrantType} ${newAccessToken}`;
 
             // 2-4. 원래 요청을 재시도
@@ -84,7 +84,7 @@ async function fetchWithAuth(url, options) {
             console.error("[Auth] 토큰 재발급 과정에서 오류가 발생했습니다:", error);
             // 재발급 실패 시 로그인 페이지로 리다이렉트
             window.location.href = 'index.html';
-            return response; 
+            return response;
         }
     }
 
@@ -250,7 +250,6 @@ function connectWebSocket() {
             }
         }
     }
-
 
 
     // --- 로그아웃 함수 ---

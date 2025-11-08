@@ -2,8 +2,7 @@ package woowacourse.chatting.jwt;
 
 public enum JwtRole {
 
-    GRANT_TYPE("Bearer")
-    ;
+    GRANT_TYPE("Bearer");
 
     private String role;
 

@@ -17,7 +17,6 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
 
-
     @Transactional
     public JwtToken singIn(SignInDto signInDto) {
 

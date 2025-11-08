@@ -5,6 +5,6 @@ import woowacourse.chatting.domain.Member;
 
 public interface MemberService {
 
-    Member findMember (Long memberId);
+    Member findMember(Long memberId);
 
 }

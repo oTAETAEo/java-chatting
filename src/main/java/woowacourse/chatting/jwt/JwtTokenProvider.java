@@ -36,7 +36,7 @@ public class JwtTokenProvider {
     private final MemberService memberService;
 
     /**
-     * @param secretKey: @Value("$jwt.secret")는 .yml에 저장 되어있는 key를 주입한다.
+     * @param secretKey:         @Value("$jwt.secret")는 .yml에 저장 되어있는 key를 주입한다.
      * @param userDetailsService : Spring Security의 표준 인터페이스를 통해 사용자 로드 기능을 주입받습니다.
      */
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, UserDetailsService userDetailsService, RefreshTokeService refreshTokeService, MemberService memberService) {
@@ -103,7 +103,7 @@ public class JwtTokenProvider {
 
         Member member = memberService.findMember(memberId);
         RefreshToken findToken = refreshTokeService.findRefreshToken(memberId);
-        if (!findToken.getToken().equals(refreshToken)){
+        if (!findToken.getToken().equals(refreshToken)) {
             throw new JwtValidationException("리프레시 토큰이 일치하지 않습니다");
         }
 
@@ -112,12 +112,12 @@ public class JwtTokenProvider {
         return getAccessToken(member, authorities);
     }
 
-    public String resolveAccessToken(HttpServletRequest request){
+    public String resolveAccessToken(HttpServletRequest request) {
 
         String accessToken = request.getHeader("Authorization");
         log.info("logout Token : {}", accessToken);
 
-        if (StringUtils.hasText(accessToken) && accessToken.startsWith("Bearer ")){
+        if (StringUtils.hasText(accessToken) && accessToken.startsWith("Bearer ")) {
             return accessToken.substring(7);
         }
 
