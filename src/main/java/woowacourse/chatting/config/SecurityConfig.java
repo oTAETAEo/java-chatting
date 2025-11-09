@@ -64,7 +64,7 @@ public class SecurityConfig {
 
                         // H2 콘솔, 회원가입, 루트 경로는 인증 없이 접근 허용
                         .requestMatchers(
-                                "/", "/sign-up", "/sign-in", "/jwt/refresh"
+                                "/", "/sign-up", "/sign-in", "/jwt/refresh" , "/ws/chat/**"
                         ).permitAll()
 
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
@@ -81,8 +81,6 @@ public class SecurityConfig {
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
-
-
         ;
 
         return http.build();
