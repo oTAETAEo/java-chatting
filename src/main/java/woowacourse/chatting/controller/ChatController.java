@@ -1,16 +1,19 @@
 package woowacourse.chatting.controller;
 
+import lombok.*;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import woowacourse.chatting.domain.Member;
+import woowacourse.chatting.dto.ChatMessage;
+import woowacourse.chatting.service.webSocket.ConnectedUserService;
 
 import java.security.Principal; // 인증된 사용자 정보를 가져오기 위해 사용
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -19,7 +22,7 @@ public class ChatController {
 
     // SimpMessagingTemplate: STOMP 메시지 브로커를 통해 클라이언트에게 메시지를 전달하는 도구
     private final SimpMessagingTemplate messagingTemplate;
-
+    private final ConnectedUserService connectedUserService;
 
     @MessageMapping("/chat")
     public void sendMessage(ChatMessage message, Principal principal) {
@@ -40,37 +43,13 @@ public class ChatController {
         log.info("메시지 전송 완료: [Destination: {}]", destination);
     }
 
-    // 이 클래스 내부에 사용할 메시지 DTO 정의
-    public static class ChatMessage {
-        private String sender;
-        private String content;
+    @MessageMapping("/chat.getUsers")
+    public void getUsers(){
+        // 현재 접속자 목록 조회
+        List<String> users = connectedUserService.getConnectedUsernames();
 
-        // Lombok을 사용하지 않을 경우 Getter/Setter/생성자를 수동으로 구현해야 합니다.
-        // 예시를 위해 Getter와 Setter를 생략하고 간결하게 작성합니다.
-
-        public String getSender() {
-            return sender;
-        }
-
-        public void setSender(String sender) {
-            this.sender = sender;
-        }
-
-        public String getContent() {
-            return content;
-        }
-
-        public void setContent(String content) {
-            this.content = content;
-        }
-
-        // 기본 생성자 (JSON 역직렬화를 위해 필요)
-        public ChatMessage() {}
-
-        // 전체 생성자
-        public ChatMessage(String sender, String content) {
-            this.sender = sender;
-            this.content = content;
-        }
+        // 요청한 사용자에게만 전송
+        messagingTemplate.convertAndSend("/topic/users", users);
     }
+
 }
