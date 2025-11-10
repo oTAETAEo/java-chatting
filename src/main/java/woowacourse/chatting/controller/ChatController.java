@@ -1,18 +1,16 @@
 package woowacourse.chatting.controller;
 
-import lombok.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-
-import lombok.extern.slf4j.Slf4j;
 import woowacourse.chatting.domain.Member;
 import woowacourse.chatting.dto.ChatMessage;
 import woowacourse.chatting.service.webSocket.ConnectedUserService;
 
-import java.security.Principal; // 인증된 사용자 정보를 가져오기 위해 사용
+import java.security.Principal;
 import java.util.List;
 
 @Slf4j
@@ -27,7 +25,7 @@ public class ChatController {
     @MessageMapping("/chat")
     public void sendMessage(ChatMessage message, Principal principal) {
         // principal 객체는 StompHandler에서 JWT를 검증하고 설정한 인증된 사용자 정보입니다.
-        if (principal instanceof Authentication auth && auth.getPrincipal() instanceof Member member){
+        if (principal instanceof Authentication auth && auth.getPrincipal() instanceof Member member) {
 
             // 메시지 객체에 인증된 사용자 이름 설정 (클라이언트가 보낸 sender 대신 서버에서 인증된 값 사용)
             String sender = member.getName();
@@ -44,7 +42,7 @@ public class ChatController {
     }
 
     @MessageMapping("/chat.getUsers")
-    public void getUsers(){
+    public void getUsers() {
         // 현재 접속자 목록 조회
         List<String> users = connectedUserService.getConnectedUsernames();
 

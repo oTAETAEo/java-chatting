@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ChatMessage{
+public class ChatMessage {
 
     private String sender;
     private String content;

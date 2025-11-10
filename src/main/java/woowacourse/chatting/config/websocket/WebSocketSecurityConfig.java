@@ -18,6 +18,7 @@ import woowacourse.chatting.jwt.JwtStompInterceptor;
 public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JwtStompInterceptor jwtStompInterceptor;
+
     /**
      * 인바운드 STOMP 메시지(SEND, SUBSCRIBE 등)에 대한 인가 규칙을 설정합니다.
      * MessageMatcherDelegatingAuthorizationManager 빌더를 사용하여 람다 기반으로 규칙을 정의합니다.
@@ -29,7 +30,7 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         return MessageMatcherDelegatingAuthorizationManager.builder()
 
                 // 1. 프로토콜 관련 메시지 타입(CONNECT, HEARTBEAT 등)은 모두 허용합니다.
-                //    (JWT 인증은 StompHandler에서 이미 처리되므로 여기서 차단하지 않습니다.)
+                //    (JWT 인증은 JwtStompInterceptor에서 이미 처리되므로 여기서 차단하지 않습니다.)
                 .simpTypeMatchers(SimpMessageType.CONNECT,
                         SimpMessageType.HEARTBEAT,
                         SimpMessageType.DISCONNECT,
