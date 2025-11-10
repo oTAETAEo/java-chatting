@@ -1,5 +1,6 @@
-package woowacourse.chatting.dto;
+package woowacourse.chatting.dto.message;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,7 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ChatMessage {
+@AllArgsConstructor
+public class ChatMessageDto {
 
     private String sender;
     private String content;
