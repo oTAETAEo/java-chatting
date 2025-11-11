@@ -41,7 +41,7 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
                 .simpDestMatchers("/app/**").authenticated()
 
                 // 3. /topic/*, /queue/* 목적지를 구독하는(SUBSCRIBE) 요청은 인증된 사용자만 허용합니다.
-                .simpDestMatchers("/topic/**", "/queue/**").authenticated()
+                .simpDestMatchers("/topic/**", "/queue/**", "/user/**").authenticated()
 
                 // 4. 위에 명시되지 않은 모든 메시지는 거부하여 보안을 강화합니다.
                 .anyMessage().denyAll()
