@@ -1,9 +1,6 @@
-package woowacourse.chatting.controller;
+package woowacourse.chatting.controller.chat;
 
-import lombok.Data;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
