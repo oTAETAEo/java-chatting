@@ -13,6 +13,7 @@ import java.util.NoSuchElementException;
 
 @Service
 @AllArgsConstructor
+@Transactional
 @Slf4j
 public class MemberServiceImp implements MemberService {
 
@@ -23,10 +24,13 @@ public class MemberServiceImp implements MemberService {
     public Member findMember(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자 입니다."));
-
     }
 
-    @Transactional
+    @Override
+    public Member findByEmailMember(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자 입니다."));
+    }
     public Long save(AddMemberRequest dto) {
         duplicateMember(dto);
 
