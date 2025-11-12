@@ -14,34 +14,22 @@ import woowacourse.chatting.dto.chat.PrivateRoomRequest;
 import woowacourse.chatting.dto.chat.RoomIdResponse;
 import woowacourse.chatting.repository.chat.ChatRoomRepository;
 import woowacourse.chatting.service.MemberService;
-
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import woowacourse.chatting.service.chat.ChatRoomService;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class ChatRoomController {
 
-    private final ChatRoomRepository chatRoomRepository;
-    private final MemberService memberService;
+    private final ChatRoomService chatRoomService;
 
     @PostMapping("/api/chat/private-room")
     public ResponseEntity<?> getPrivateChatRoomId(@RequestBody PrivateRoomRequest roomRequest, @AuthenticationPrincipal Member member){
 
-        Optional<ChatRoom> findChatRoom = chatRoomRepository.findByUsers(member.getEmail(), roomRequest.getRecipientUsername(), ChatRoomType.PRIVATE);
+        ChatRoom privetchatRoom = chatRoomService.findPrivateChatRoomByMemberEmail(
+                roomRequest.getRecipientUsername(), member.getEmail(), ChatRoomType.PRIVATE);
 
-        if (findChatRoom.isPresent()){
-            return ResponseEntity.ok(new RoomIdResponse(findChatRoom.get().getId()));
-        }
-
-        Member recipientMember = memberService.findByEmailMember(roomRequest.getRecipientUsername());
-        Member senderMember = memberService.findMember(member.getId());
-        ChatRoom createChatRoom = new ChatRoom(UUID.randomUUID(), Set.of(recipientMember, senderMember), ChatRoomType.PRIVATE);
-        chatRoomRepository.save(createChatRoom);
-
-        return ResponseEntity.ok(new RoomIdResponse(createChatRoom.getId()));
+        return ResponseEntity.ok(new RoomIdResponse(privetchatRoom.getId()));
     }
 }
 
