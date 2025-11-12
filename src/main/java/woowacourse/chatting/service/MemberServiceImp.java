@@ -31,6 +31,7 @@ public class MemberServiceImp implements MemberService {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자 입니다."));
     }
+
     public Long save(AddMemberRequest dto) {
         duplicateMember(dto);
 

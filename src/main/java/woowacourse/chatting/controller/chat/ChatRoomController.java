@@ -12,8 +12,6 @@ import woowacourse.chatting.domain.chat.ChatRoom;
 import woowacourse.chatting.domain.chat.ChatRoomType;
 import woowacourse.chatting.dto.chat.PrivateRoomRequest;
 import woowacourse.chatting.dto.chat.RoomIdResponse;
-import woowacourse.chatting.repository.chat.ChatRoomRepository;
-import woowacourse.chatting.service.MemberService;
 import woowacourse.chatting.service.chat.ChatRoomService;
 
 @Slf4j
@@ -24,7 +22,7 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
 
     @PostMapping("/api/chat/private-room")
-    public ResponseEntity<?> getPrivateChatRoomId(@RequestBody PrivateRoomRequest roomRequest, @AuthenticationPrincipal Member member){
+    public ResponseEntity<?> getPrivateChatRoomId(@RequestBody PrivateRoomRequest roomRequest, @AuthenticationPrincipal Member member) {
 
         ChatRoom privetchatRoom = chatRoomService.findPrivateChatRoomByMemberEmail(
                 roomRequest.getRecipientUsername(), member.getEmail(), ChatRoomType.PRIVATE);

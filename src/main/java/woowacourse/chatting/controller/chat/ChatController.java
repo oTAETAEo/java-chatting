@@ -4,29 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import woowacourse.chatting.ChatRoomCache;
-import woowacourse.chatting.domain.Member;
-import woowacourse.chatting.domain.chat.ChatMessage;
 import woowacourse.chatting.domain.chat.ChatRoom;
-import woowacourse.chatting.domain.chat.MessageType;
 import woowacourse.chatting.dto.chat.ChatMessageDto;
-import woowacourse.chatting.dto.chat.PrivateMessageDto;
 import woowacourse.chatting.dto.chat.RoomIdResponse;
-import woowacourse.chatting.repository.chat.ChatMessageRepository;
-import woowacourse.chatting.repository.chat.ChatRoomRepository;
 import woowacourse.chatting.service.chat.ChatRoomService;
 import woowacourse.chatting.service.chat.ChatService;
 import woowacourse.chatting.service.webSocket.ConnectedUserService;
 
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor

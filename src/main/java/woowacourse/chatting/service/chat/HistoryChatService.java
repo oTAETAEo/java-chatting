@@ -14,7 +14,7 @@ public class HistoryChatService {
 
     private final ChatMessageRepository chatMessageRepository;
 
-    public List<ChatMessageDto> findHistoryChatting(String roomId){
+    public List<ChatMessageDto> findHistoryChatting(String roomId) {
         return chatMessageRepository.findHistoryMessage(UUID.fromString(roomId))
                 .stream()
                 .map(m -> ChatMessageDto.builder()

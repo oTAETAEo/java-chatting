@@ -18,16 +18,16 @@ public class ChattingApplication {
     MemberService memberService;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         memberService.save(new AddMemberRequest(
                 "test@test.com"
-                ,"홍길동"
-                ,"1111")
+                , "홍길동"
+                , "1111")
         );
         memberService.save(new AddMemberRequest(
                 "1@1"
-                ,"강감찬"
-                ,"1111")
+                , "강감찬"
+                , "1111")
         );
     }
 }

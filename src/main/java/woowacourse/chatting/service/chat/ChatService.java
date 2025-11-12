@@ -14,7 +14,7 @@ public class ChatService {
 
     private final ChatMessageRepository chatMessageRepository;
 
-    public void chatMessageSave(ChatRoom chatRoom, ChatMessageDto messageDto){
+    public void chatMessageSave(ChatRoom chatRoom, ChatMessageDto messageDto) {
         chatMessageRepository.save(ChatMessage.builder()
                 .chatRoom(chatRoom) // 공개방 설정
                 .content(messageDto.getContent())

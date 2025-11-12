@@ -1,6 +1,8 @@
 package woowacourse.chatting.dto.chat;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

@@ -21,16 +21,16 @@ public class ChatRoomService {
 
     private final MemberService memberService;
 
-    public ChatRoom findChatRoom(String roomId){
+    public ChatRoom findChatRoom(String roomId) {
         return chatRoomRepository.findById(UUID.fromString(roomId))
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 입니다."));
     }
 
-    public ChatRoom getPublicChatRoom(){
+    public ChatRoom getPublicChatRoom() {
         return chatRoomCache.getPublicRoom();
     }
 
-    public ChatRoom createPrivateChatRoom(Member member1, Member member2){
+    public ChatRoom createPrivateChatRoom(Member member1, Member member2) {
         return ChatRoom.builder()
                 .id(UUID.randomUUID())
                 .members(Set.of(member1, member2))
@@ -38,12 +38,12 @@ public class ChatRoomService {
                 .build();
     }
 
-    public ChatRoom findPrivateChatRoomByMemberEmail(String email1, String email2, ChatRoomType type){
+    public ChatRoom findPrivateChatRoomByMemberEmail(String email1, String email2, ChatRoomType type) {
         return chatRoomRepository.findByUsers(email1, email2, type)
                 .orElseGet(() -> {
                     Member recipientMember = memberService.findByEmailMember(email1);
                     Member senderMember = memberService.findByEmailMember(email2);
-                     return createPrivateChatRoom(recipientMember, senderMember);
+                    return createPrivateChatRoom(recipientMember, senderMember);
                 });
     }
 

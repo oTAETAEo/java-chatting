@@ -15,12 +15,12 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, UUID> {
 
 
     @Query("""
-    select r from ChatRoom r
-        join r.members m
-        where m.email in (:userA, :userB) and r.roomType = :type
-        group by r
-        having count(distinct m) = 2
-    """)
+            select r from ChatRoom r
+                join r.members m
+                where m.email in (:userA, :userB) and r.roomType = :type
+                group by r
+                having count(distinct m) = 2
+            """)
     Optional<ChatRoom> findByUsers(@Param("userA") String userA, @Param("userB") String userB, @Param("type") ChatRoomType type);
 
 }
