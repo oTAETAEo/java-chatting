@@ -1,4 +1,4 @@
-package woowacourse.chatting.domain.message;
+package woowacourse.chatting.domain.chat;
 
 import jakarta.persistence.*;
 import lombok.*;

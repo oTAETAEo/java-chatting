@@ -1,9 +1,9 @@
-package woowacourse.chatting.repository.message;
+package woowacourse.chatting.repository.chat;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import woowacourse.chatting.domain.message.ChatMessage;
+import woowacourse.chatting.domain.chat.ChatMessage;
 
 import java.util.List;
 import java.util.UUID;

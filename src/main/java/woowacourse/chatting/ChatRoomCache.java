@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-import woowacourse.chatting.domain.message.ChatRoom;
-import woowacourse.chatting.domain.message.ChatRoomType;
-import woowacourse.chatting.repository.message.ChatRoomRepository;
+import woowacourse.chatting.domain.chat.ChatRoom;
+import woowacourse.chatting.domain.chat.ChatRoomType;
+import woowacourse.chatting.repository.chat.ChatRoomRepository;
 
 import java.util.Set;
 import java.util.UUID;

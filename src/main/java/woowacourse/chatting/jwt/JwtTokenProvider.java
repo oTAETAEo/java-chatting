@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import woowacourse.chatting.domain.Member;
-import woowacourse.chatting.domain.RefreshToken;
+import woowacourse.chatting.domain.auth.RefreshToken;
 import woowacourse.chatting.exception.jwt.JwtValidationException;
 import woowacourse.chatting.service.MemberService;
 import woowacourse.chatting.service.RefreshTokeService;

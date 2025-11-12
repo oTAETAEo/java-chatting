@@ -5,10 +5,10 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import woowacourse.chatting.domain.message.ChatRoom;
-import woowacourse.chatting.dto.message.ChatMessageDto;
-import woowacourse.chatting.repository.message.ChatMessageRepository;
-import woowacourse.chatting.repository.message.ChatRoomRepository;
+import woowacourse.chatting.domain.chat.ChatRoom;
+import woowacourse.chatting.dto.chat.ChatMessageDto;
+import woowacourse.chatting.repository.chat.ChatMessageRepository;
+import woowacourse.chatting.repository.chat.ChatRoomRepository;
 
 import java.security.Principal;
 import java.util.List;

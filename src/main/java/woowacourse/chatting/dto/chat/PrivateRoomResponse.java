@@ -1,4 +1,4 @@
-package woowacourse.chatting.dto.message;
+package woowacourse.chatting.dto.chat;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

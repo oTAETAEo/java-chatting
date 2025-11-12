@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import woowacourse.chatting.domain.Member;
-import woowacourse.chatting.domain.message.ChatRoom;
-import woowacourse.chatting.domain.message.ChatRoomType;
-import woowacourse.chatting.dto.message.PrivateRoomRequest;
-import woowacourse.chatting.dto.message.PrivateRoomResponse;
-import woowacourse.chatting.repository.message.ChatRoomRepository;
+import woowacourse.chatting.domain.chat.ChatRoom;
+import woowacourse.chatting.domain.chat.ChatRoomType;
+import woowacourse.chatting.dto.chat.PrivateRoomRequest;
+import woowacourse.chatting.dto.chat.PrivateRoomResponse;
+import woowacourse.chatting.repository.chat.ChatRoomRepository;
 import woowacourse.chatting.service.MemberService;
 
 import java.util.Optional;

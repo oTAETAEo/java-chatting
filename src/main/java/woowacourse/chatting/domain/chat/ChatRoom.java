@@ -1,11 +1,10 @@
-package woowacourse.chatting.domain.message;
+package woowacourse.chatting.domain.chat;
 
 import jakarta.persistence.*;
 import lombok.*;
 import woowacourse.chatting.domain.Member;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package woowacourse.chatting.dto.message;
+package woowacourse.chatting.dto.chat;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PrivateMessageDto {
+public class ChatMessageDto {
+
     private String sender;
-    private String recipient;
     private String content;
 }

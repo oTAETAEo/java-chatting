@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.filter.OncePerRequestFilter;
 import woowacourse.chatting.domain.Member;
-import woowacourse.chatting.domain.RefreshToken;
+import woowacourse.chatting.domain.auth.RefreshToken;
 import woowacourse.chatting.dto.ResponseDto;
 import woowacourse.chatting.jwt.JwtTokenProvider;
 import woowacourse.chatting.repository.RefreshTokeRepository;
@@ -21,7 +21,6 @@ import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
-
 public class JwtLogoutFilter extends OncePerRequestFilter {
 
     private final RefreshTokeRepository refreshTokeRepository;

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import woowacourse.chatting.domain.RefreshToken;
+import woowacourse.chatting.domain.auth.RefreshToken;
 import woowacourse.chatting.repository.RefreshTokeRepository;
 
 import java.util.Arrays;
