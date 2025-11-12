@@ -31,7 +31,7 @@ public class ChatRoomCache implements ApplicationRunner {
                         ChatRoom.builder()
                                 .id(publicRoomId)
                                 .members(Set.of())
-                                .type(ChatRoomType.GROUP)
+                                .roomType(ChatRoomType.GROUP)
                                 .build()
                 ));
     }
