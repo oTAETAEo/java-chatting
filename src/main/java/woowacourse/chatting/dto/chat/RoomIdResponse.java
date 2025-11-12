@@ -9,6 +9,6 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PrivateRoomResponse {
+public class RoomIdResponse {
     private UUID roomId;
 }
