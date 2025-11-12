@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 채팅</title>
+    <link rel="stylesheet" href="./css/chatV2_style.css">
+</head>
+<body>
+<div id="app-layout">
+    <!-- 1. 왼쪽 사이드바 (사용자 목록) -->
+    <div id="sidebar">
+        <h3 class="sidebar-title">접속 사용자</h3>
+        <div id="user-list" class="user-list">
+            <!-- 사용자 목록이 JS에 의해 여기에 동적으로 추가됩니다. -->
+            <div class="user-item-placeholder">사용자 로딩 중...</div>
+        </div>
+    </div>
+
+    <!-- 2. 오른쪽 채팅 영역 -->
+    <div id="main-chat">
+        <div class="chat-header">
+            <h2 id="chat-room-name">채널: 모두와 대화 (공개 채팅)</h2>
+            <div class="action-buttons">
+                <button id="disconnect-button">연결 끊기</button>
+                <button id="reconnect-button">다시 연결</button>
+                <button id="logout-button">로그아웃</button>
+            </div>
+        </div>
+
+        <!-- 메시지 출력 영역 -->
+        <div id="chat-messages" class="messages-box">
+            <!-- 채팅 메시지가 여기에 표시됩니다. -->
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="username-input" placeholder="사용자 이름 (토큰에서 추출됨)" required disabled>
+            <input type="text" id="message-input" placeholder="메시지 입력..." required>
+            <button id="send-button">전송</button>
+        </div>
+
+        <p id="status-message" class="status-info">연결 대기 중...</p>
+
+        <!-- API 테스트 영역 -->
+        <div class="api-test-area">
+            <button id="test-api-button">
+                /test GET 요청 (인증 필요)
+            </button>
+            <p id="api-result-message" class="status-info api-result"></p>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="./js/chatV2_script.js"></script>
+</body>
+</html>

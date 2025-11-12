@@ -8,9 +8,9 @@ import java.util.Map;
 @Getter
 public class ErrorResponse {
 
-    private LocalDateTime timestamp = LocalDateTime.now(); // 오류 발생 시점
-    private Map<String, String> error; // 오류 메시지 (예: "이미 존재하는 이메일입니다.")
-    private String message;
+    private final LocalDateTime timestamp = LocalDateTime.now(); // 오류 발생 시점
+    private final Map<String, String> error; // 오류 메시지 (예: "이미 존재하는 이메일입니다.")
+    private final String message;
 
     public ErrorResponse(String message) {
         this.message = message;

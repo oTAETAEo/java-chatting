@@ -1,0 +1,209 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #1e1e2d; /* 디스코드 유사 배경 */
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#app-layout {
+    display: flex;
+    width: 90vw;
+    max-width: 1200px;
+    height: 90vh;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* --- 1. 사이드바 (사용자 목록) --- */
+#sidebar {
+    width: 250px;
+    background-color: #2f3136; /* 디스코드 유사 어두운 색 */
+    color: #dcddde;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border-right: 1px solid #202225;
+}
+
+.sidebar-title {
+    color: #a3a6aa;
+    font-size: 1.1em;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #444;
+    margin-bottom: 10px;
+}
+
+.user-list {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.user-item {
+    padding: 8px 10px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.user-item:hover, .user-item.active {
+    background-color: #4f545c;
+    color: white;
+}
+
+.user-item .status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #43b581; /* 온라인 색상 */
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+/* --- 2. 메인 채팅 영역 --- */
+#main-chat {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #36393f;
+    color: #dcddde;
+    padding: 20px;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #444;
+}
+
+.messages-box {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px 0;
+    margin-bottom: 15px;
+}
+
+.message {
+    padding: 8px 0; /* Increased vertical padding */
+    line-height: 1.5;
+    word-wrap: break-word;
+    margin-bottom: 4px; /* Add some space between messages */
+}
+
+.message strong {
+    color: #7289da; /* 디스코드 유사 사용자 색상 */
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.input-area {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px; /* Add padding around the input area */
+    background-color: #2f3136; /* Discord-like input background */
+    border-radius: 8px; /* Slightly more rounded corners */
+    align-items: center;
+}
+
+#username-input {
+    width: 100px;
+    background-color: #40444b; /* Darker input field background */
+    border: none;
+    color: #dcddde;
+    border-radius: 8px; /* More rounded */
+    padding: 10px;
+}
+
+#message-input {
+    flex-grow: 1;
+    background-color: #40444b; /* Darker input field background */
+    border: none;
+    color: #dcddde;
+    border-radius: 8px; /* More rounded */
+    padding: 10px;
+}
+
+#send-button {
+    background-color: #5865f2; /* Discord blue for send button */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px; /* More rounded */
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#send-button:hover {
+    background-color: #4752c4; /* Darker blue on hover */
+}
+
+/* --- 버튼 및 상태 --- */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-buttons button, #test-api-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    background-color: #7289da;
+    color: white;
+    font-weight: 500;
+}
+
+#test-api-button {
+    margin-top: 10px;
+    width: 100%;
+}
+
+#disconnect-button {
+    background-color: #f04747;
+}
+
+#logout-button {
+    background-color: #faa61a;
+}
+
+.status-info {
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.api-result {
+    padding: 5px 0;
+    font-weight: bold;
+}
+
+/* Custom Scrollbar for Webkit browsers */
+.user-list::-webkit-scrollbar,
+.messages-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+.user-list::-webkit-scrollbar-track,
+.messages-box::-webkit-scrollbar-track {
+    background: #2f3136; /* Track color */
+    border-radius: 10px;
+}
+
+.user-list::-webkit-scrollbar-thumb,
+.messages-box::-webkit-scrollbar-thumb {
+    background: #4f545c; /* Thumb color */
+    border-radius: 10px;
+}
+
+.user-list::-webkit-scrollbar-thumb:hover,
+.messages-box::-webkit-scrollbar-thumb:hover {
+    background: #6a6e73; /* Thumb color on hover */
+}
