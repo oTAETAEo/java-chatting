@@ -11,7 +11,7 @@ import woowacourse.chatting.domain.Member;
 import woowacourse.chatting.domain.chat.ChatRoom;
 import woowacourse.chatting.domain.chat.ChatRoomType;
 import woowacourse.chatting.dto.chat.PrivateRoomRequest;
-import woowacourse.chatting.dto.chat.PrivateRoomResponse;
+import woowacourse.chatting.dto.chat.RoomIdResponse;
 import woowacourse.chatting.repository.chat.ChatRoomRepository;
 import woowacourse.chatting.service.MemberService;
 
@@ -29,10 +29,11 @@ public class ChatRoomController {
 
     @PostMapping("/api/chat/private-room")
     public ResponseEntity<?> getPrivateChatRoomId(@RequestBody PrivateRoomRequest roomRequest, @AuthenticationPrincipal Member member){
+
         Optional<ChatRoom> findChatRoom = chatRoomRepository.findByUsers(member.getEmail(), roomRequest.getRecipientUsername(), ChatRoomType.PRIVATE);
 
         if (findChatRoom.isPresent()){
-            return ResponseEntity.ok(new PrivateRoomResponse(findChatRoom.get().getId()));
+            return ResponseEntity.ok(new RoomIdResponse(findChatRoom.get().getId()));
         }
 
         Member recipientMember = memberService.findByEmailMember(roomRequest.getRecipientUsername());
@@ -40,7 +41,7 @@ public class ChatRoomController {
         ChatRoom createChatRoom = new ChatRoom(UUID.randomUUID(), Set.of(recipientMember, senderMember), ChatRoomType.PRIVATE);
         chatRoomRepository.save(createChatRoom);
 
-        return ResponseEntity.ok(new PrivateRoomResponse(createChatRoom.getId()));
+        return ResponseEntity.ok(new RoomIdResponse(createChatRoom.getId()));
     }
 }
 
