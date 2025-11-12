@@ -125,7 +125,7 @@ function setupSubscriptions() {
         displayMessage(message.sender, message.content, 'private');
     });
 
-    userListSub = stompClient.subscribe('/topic/users', msg => {
+    userListSub = stompClient.subscribe('/user/queue/users', msg => {
         const users = JSON.parse(msg.body);
         renderUserList(users);
     });
