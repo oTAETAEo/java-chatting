@@ -7,12 +7,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import woowacourse.chatting.domain.Member;
-import woowacourse.chatting.domain.chat.ChatRoom;
+import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.domain.chat.ChatRoomType;
 import woowacourse.chatting.dto.chat.PrivateRoomRequest;
 import woowacourse.chatting.dto.chat.RoomIdResponse;
 import woowacourse.chatting.service.chat.ChatRoomService;
+
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -24,10 +25,10 @@ public class ChatRoomController {
     @PostMapping("/api/chat/private-room")
     public ResponseEntity<?> getPrivateChatRoomId(@RequestBody PrivateRoomRequest roomRequest, @AuthenticationPrincipal Member member) {
 
-        ChatRoom privetchatRoom = chatRoomService.findPrivateChatRoomByMemberEmail(
+        UUID chatRoomId = chatRoomService.findPrivateChatRoomIdByMemberEmail(
                 roomRequest.getRecipientUsername(), member.getEmail(), ChatRoomType.PRIVATE);
 
-        return ResponseEntity.ok(new RoomIdResponse(privetchatRoom.getId()));
+        return ResponseEntity.ok(new RoomIdResponse(chatRoomId));
     }
 }
 

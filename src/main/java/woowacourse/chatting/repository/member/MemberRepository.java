@@ -1,8 +1,8 @@
-package woowacourse.chatting.repository;
+package woowacourse.chatting.repository.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import woowacourse.chatting.domain.Member;
+import woowacourse.chatting.domain.member.Member;
 
 import java.util.Optional;
 

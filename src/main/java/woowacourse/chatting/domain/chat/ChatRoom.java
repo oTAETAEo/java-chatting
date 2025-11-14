@@ -2,7 +2,7 @@ package woowacourse.chatting.domain.chat;
 
 import jakarta.persistence.*;
 import lombok.*;
-import woowacourse.chatting.domain.Member;
+import woowacourse.chatting.domain.member.Member;
 
 import java.util.HashSet;
 import java.util.Set;

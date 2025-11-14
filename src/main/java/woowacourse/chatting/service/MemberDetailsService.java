@@ -5,10 +5,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import woowacourse.chatting.repository.MemberRepository;
+import org.springframework.transaction.annotation.Transactional;
+import woowacourse.chatting.repository.member.MemberRepository;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MemberDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;

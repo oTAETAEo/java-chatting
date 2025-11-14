@@ -21,7 +21,6 @@ public class WebSocketEventListener {
         String username = accessor.getUser().getName(); // Principal에서 이름 추출
 
         connectedUserService.addUser(username);
-        messagingTemplate.convertAndSend("/topic/users", connectedUserService.getConnectedUsernames());
     }
 
     @EventListener
@@ -31,7 +30,6 @@ public class WebSocketEventListener {
 
         if (username != null) {
             connectedUserService.removeUser(username);
-            messagingTemplate.convertAndSend("/topic/users", connectedUserService.getConnectedUsernames());
         }
     }
 }
