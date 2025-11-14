@@ -125,7 +125,7 @@ loginForm.addEventListener('submit', async (e) => {
             loginMessage.textContent = `로그인 성공! ${result.message || ''}`;
             loginMessage.classList.add('success');
 
-            window.location.href = 'chatV2.html';
+            window.location.href = 'chatV3.html';
         } else {
             // 로그인 실패
             const errorData = await response.json();
