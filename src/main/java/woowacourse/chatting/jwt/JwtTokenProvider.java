@@ -101,7 +101,7 @@ public class JwtTokenProvider {
 
         Long memberId = getMemberIdFromRefreshToken(refreshToken);
 
-        Member member = memberService.findMember(memberId);
+        Member member = memberService.findById(memberId);
         RefreshToken findToken = refreshTokeService.findRefreshToken(memberId);
         if (!findToken.getToken().equals(refreshToken)) {
             throw new JwtValidationException("리프레시 토큰이 일치하지 않습니다");
