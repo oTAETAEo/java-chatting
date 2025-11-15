@@ -9,7 +9,7 @@ public interface MemberService {
 
     Member findByEmailMember(String email);
 
-    Member findMember(Long memberId);
+    Member findById(Long memberId);
 
     Long save(AddMemberRequest dto);
 

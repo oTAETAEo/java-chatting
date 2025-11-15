@@ -6,6 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woowacourse.chatting.domain.member.FriendRelation;
+import woowacourse.chatting.domain.member.FriendStatus;
 import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.dto.AddMemberRequest;
 import woowacourse.chatting.repository.member.MemberRepository;
@@ -22,7 +23,7 @@ public class MemberServiceImp implements MemberService {
     private final BCryptPasswordEncoder encoder;
 
     @Override
-    public Member findMember(Long memberId) {
+    public Member findById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자 입니다."));
     }
@@ -38,6 +39,7 @@ public class MemberServiceImp implements MemberService {
         return FriendRelation.builder()
                 .from(my)
                 .to(findByEmailMember(friendEmail))
+                .status(FriendStatus.REQUESTED)
                 .build();
     }
 
