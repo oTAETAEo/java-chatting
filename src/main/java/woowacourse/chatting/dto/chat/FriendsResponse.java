@@ -10,5 +10,5 @@ import java.util.List;
 public class FriendsResponse {
     private List<FriendResponseDto> sentFriendRequests;
     private List<FriendResponseDto> receivedFriendRequests;
-    private List<String> friends;
+    private List<FriendDto> friends;
 }
