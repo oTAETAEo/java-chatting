@@ -9,4 +9,5 @@ public class FriendResponseDto {
     private Long id;
     private String fromName;
     private String toName;
+    private String email;
 }
