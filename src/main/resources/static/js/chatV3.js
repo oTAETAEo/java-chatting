@@ -112,13 +112,6 @@ function requestPublicHistory() {
 
     console.log("공개방 히스토리 메시지 가져오기")
     stompClient.send(`/app/history/public/${publicRoomId}`, {}, {});
-
-    // if (!publicRoomId) {
-    //     stompClient.send('/app/chat.getPublicRoom', {});
-    // } else {
-    //     console.log("공개방 히스토리 메시지 가져오기")
-    //     stompClient.send(`/app/history/public/${publicRoomId}`, {}, {});
-    // }
 }
 
 // --- 구독 설정 ---
@@ -479,11 +472,11 @@ async function fetchFriendData() {
         sentRequestsContent.innerHTML = '';
         if (data.sentFriendRequests && data.sentFriendRequests.length > 0) {
             data.sentFriendRequests.forEach(request => {
-                const item = createFriendItem(request.toName, 'sent', request.id);
+                const item = createFriendItem(request, 'sent', request.id); // Pass the whole request object
                 sentRequestsContent.appendChild(item);
             });
         } else {
-            sentRequestsContent.textContent = '보낸 친구 요청이 없습니다.';
+            sentRequestsContent.innerHTML = '<div class="no-content-message">보낸 친구 요청이 없습니다.</div>';
         }
 
         // 받은 요청 표시
@@ -491,23 +484,23 @@ async function fetchFriendData() {
         receivedRequestsContent.innerHTML = '';
         if (data.receivedFriendRequests && data.receivedFriendRequests.length > 0) {
             data.receivedFriendRequests.forEach(request => {
-                const item = createFriendItem(request.fromName, 'received', request.id);
+                const item = createFriendItem(request, 'received', request.id); // Pass the whole request object
                 receivedRequestsContent.appendChild(item);
             });
         } else {
-            receivedRequestsContent.textContent = '받은 친구 요청이 없습니다.';
+            receivedRequestsContent.innerHTML = '<div class="no-content-message">받은 친구 요청이 없습니다.</div>';
         }
 
         // 모든 친구 표시
         const allFriendsContent = document.getElementById('all-friends-content');
         allFriendsContent.innerHTML = '';
         if (data.friends && data.friends.length > 0) {
-            data.friends.forEach(friendName => {
-                const item = createFriendItem(friendName, 'friend');
+            data.friends.forEach(friend => {
+                const item = createFriendItem(friend, 'friend');
                 allFriendsContent.appendChild(item);
             });
         } else {
-            allFriendsContent.textContent = '친구가 없습니다.';
+            allFriendsContent.innerHTML = '<div class="no-content-message">친구가 없습니다.</div>';
         }
 
     } catch (error) {
@@ -517,63 +510,130 @@ async function fetchFriendData() {
 }
 
 // --- 친구 목록 아이템 생성 ---
-function createFriendItem(name, type, id = null) {
+function createFriendItem(data, type, id = null) { // 'data' can be string (name) or object ({name, email} or {toName, toEmail} or {fromName, fromEmail})
     const item = document.createElement('div');
     item.className = 'friend-item';
 
     const pic = document.createElement('div');
     pic.className = 'friend-item-pic';
 
-    const itemName = document.createElement('div');
-    itemName.className = 'friend-item-name';
-    itemName.textContent = name;
-
     const actions = document.createElement('div');
     actions.className = 'friend-item-actions';
 
-    if (type === 'sent') {
-        const cancelButton = document.createElement('button');
-        cancelButton.className = 'cancel-btn';
-        cancelButton.textContent = '취소';
-        cancelButton.onclick = () => cancelFriendRequest(id);
-        actions.appendChild(cancelButton);
-    } else if (type === 'received') {
-        const acceptButton = document.createElement('button');
-        acceptButton.className = 'accept-btn';
-        acceptButton.textContent = '수락';
-        acceptButton.onclick = () => acceptFriendRequest(id);
+    item.appendChild(pic);
 
-        const declineButton = document.createElement('button');
-        declineButton.className = 'decline-btn';
-        declineButton.textContent = '거절';
-        declineButton.onclick = () => declineFriendRequest(id);
+    if (type === 'friend') {
+        // data is a friend object: { id, name, email }
+        const info = document.createElement('div');
+        info.className = 'friend-item-info';
 
-        actions.appendChild(acceptButton);
-        actions.appendChild(declineButton);
-    } else if (type === 'friend') {
+        const itemName = document.createElement('div');
+        itemName.className = 'friend-item-name';
+        itemName.textContent = data.name;
+
+        const itemEmail = document.createElement('div');
+        itemEmail.className = 'friend-item-email';
+        itemEmail.textContent = data.email;
+
+        info.appendChild(itemName);
+        info.appendChild(itemEmail);
+        item.appendChild(info);
+
         const removeButton = document.createElement('button');
         removeButton.className = 'remove-btn';
         removeButton.textContent = '삭제';
-        removeButton.onclick = () => removeFriend(name);
+        removeButton.onclick = () => removeFriend(data.name);
         actions.appendChild(removeButton);
+    } else if (type === 'sent') {
+        // data is a request object: { toName, toEmail, id }
+        const info = document.createElement('div');
+        info.className = 'friend-item-info';
+
+        const itemName = document.createElement('div');
+        itemName.className = 'friend-item-name';
+        itemName.textContent = data.toName;
+
+        const itemEmail = document.createElement('div');
+        itemEmail.className = 'friend-item-email';
+        itemEmail.textContent = data.email || '이메일 정보 없음';
+
+        info.appendChild(itemName);
+        info.appendChild(itemEmail);
+        item.appendChild(info);
+
+        const cancelButton = document.createElement('button');
+        cancelButton.className = 'cancel-btn';
+        cancelButton.textContent = '취소';
+        cancelButton.onclick = () => cancelFriendRequest(data.id);
+        actions.appendChild(cancelButton);
+    } else if (type === 'received') { // New block for received requests
+        // data is a request object: { fromName, fromEmail, id } (ASSUMPTION for fromEmail)
+        const info = document.createElement('div');
+        info.className = 'friend-item-info';
+
+        const itemName = document.createElement('div');
+        itemName.className = 'friend-item-name';
+        itemName.textContent = data.fromName;
+
+        const itemEmail = document.createElement('div');
+        itemEmail.className = 'friend-item-email';
+        itemEmail.textContent = data.email || '이메일 정보 없음';
+
+        info.appendChild(itemName);
+        info.appendChild(itemEmail);
+        item.appendChild(info);
+
+        const acceptButton = document.createElement('button');
+        acceptButton.className = 'accept-btn';
+        acceptButton.textContent = '수락';
+        acceptButton.onclick = () => acceptFriendRequest(data.id);
+        
+        const declineButton = document.createElement('button');
+        declineButton.className = 'decline-btn';
+        declineButton.textContent = '거절';
+        declineButton.onclick = () => declineFriendRequest(data.id);
+
+        actions.appendChild(acceptButton);
+        actions.appendChild(declineButton);
     }
 
-    item.appendChild(pic);
-    item.appendChild(itemName);
     item.appendChild(actions);
-
     return item;
 }
+// --- 친구 관련 액션 핸들러 ---
 
-// --- 친구 관련 액션 핸들러 (자리 표시자) ---
+async function updateFriendRequestStatus(id, status) {
+    try {
+        const response = await fetchWithAuth(`/friend/status/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            },
+            body: JSON.stringify({ status: status })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || '요청 처리에 실패했습니다.');
+        }
+
+        alert(`요청을 ${status === 'ACCEPT' ? '수락' : '거절'}했습니다.`);
+        await fetchFriendData(); // Refresh the friend list
+
+    } catch (error) {
+        console.error('친구 요청 처리 중 오류:', error);
+        alert(`친구 요청 처리 중 오류가 발생했습니다: ${error.message}`);
+    }
+}
+
+
 function acceptFriendRequest(id) {
-    console.log(`Accepting friend request with id: ${id}`);
-    // 여기에 수락 API 호출 로직 추가
+    updateFriendRequestStatus(id, 'ACCEPT');
 }
 
 function declineFriendRequest(id) {
-    console.log(`Declining friend request with id: ${id}`);
-    // 여기에 거절 API 호출 로직 추가
+    updateFriendRequestStatus(id, 'REJECT');
 }
 
 function cancelFriendRequest(id) {

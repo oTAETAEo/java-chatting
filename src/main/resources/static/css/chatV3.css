@@ -279,9 +279,18 @@ body {
     margin-right: 15px;
 }
 
-.friend-item-name {
+.friend-item-info {
     flex-grow: 1;
+}
+
+.friend-item-name {
     color: white;
+    font-weight: 500;
+}
+
+.friend-item-email {
+    color: #a5a6ab;
+    font-size: 0.9em;
 }
 
 .friend-item-actions button {
@@ -302,6 +311,13 @@ body {
 .friend-item-actions .remove-btn {
     background-color: #d83c3e;
     color: white;
+}
+
+.no-content-message {
+    text-align: center;
+    color: #a5a6ab;
+    font-size: 1.2em;
+    padding: 40px 0;
 }
 
 /* --- Main Chat --- */
@@ -331,32 +347,38 @@ body {
 #chat-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Add space between messages */
 }
 
 .message {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 10px;
+    max-width: 70%; /* Prevent messages from being too wide */
+    transition: background-color 0.2s;
 }
 
 .message span {
     background-color: #4f545c;
-    padding: 8px 12px;
-    border-radius: 15px;
+    padding: 10px 15px;
+    border-radius: 18px;
     display: inline-block;
     color: white;
+    word-wrap: break-word; /* Break long words */
+    width: fit-content; /* Adjust width to content */
 }
 
 .message strong {
     color: #a5a6ab;
     font-size: 0.9em;
-    margin-bottom: 4px;
-    margin-left: 4px;
+    margin-bottom: 5px;
+    margin-left: 5px;
 }
 
 .my-message {
+    align-self: flex-end; /* Align user's messages to the right */
     align-items: flex-end;
 }
 
@@ -371,26 +393,36 @@ body {
 /* Input Area */
 #chat-input {
     display: flex;
-    gap: 8px;
-    padding: 10px;
+    gap: 10px;
+    padding: 15px;
     background: #2b2d31;
+    border-top: 1px solid #444;
 }
 
 #chat-input input {
-    padding: 10px;
-    border-radius: 6px;
+    flex-grow: 1;
+    padding: 12px 15px;
+    border-radius: 20px; /* Rounded input field */
     border: none;
     background: #3a3c43;
     color: white;
+    font-size: 1em;
 }
 
 #send-button {
     background: #5865f2;
     color: white;
-    border-radius: 6px;
+    border-radius: 10px; /* Rounded rectangular button */
     border: none;
     cursor: pointer;
-    padding: 10px 15px;
+    padding: 10px 15px; /* Adjust padding for rectangular shape */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em; /* Adjust icon/text size if needed */
+    transition: background-color 0.2s;
+    width: auto; /* Allow width to adjust based on content */
+    height: auto; /* Allow height to adjust based on content */
 }
 
 #send-button:hover {
