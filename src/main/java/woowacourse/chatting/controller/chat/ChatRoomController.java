@@ -11,6 +11,7 @@ import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.domain.chat.ChatRoomType;
 import woowacourse.chatting.dto.chat.PrivateRoomRequest;
 import woowacourse.chatting.dto.chat.RoomIdResponse;
+import woowacourse.chatting.service.MemberService;
 import woowacourse.chatting.service.chat.ChatRoomService;
 
 import java.util.UUID;
@@ -21,12 +22,18 @@ import java.util.UUID;
 public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
+    private final MemberService memberService;
 
     @PostMapping("/api/chat/private-room")
-    public ResponseEntity<?> getPrivateChatRoomId(@RequestBody PrivateRoomRequest roomRequest, @AuthenticationPrincipal Member member) {
+    public ResponseEntity<RoomIdResponse> getPrivateChatRoomId(
+            @RequestBody PrivateRoomRequest roomRequest,
+            @AuthenticationPrincipal UUID sender) {
 
-        UUID chatRoomId = chatRoomService.findPrivateChatRoomIdByMemberEmail(
-                roomRequest.getRecipientUsername(), member.getEmail(), ChatRoomType.PRIVATE);
+        Member recipient = memberService.findBySubId(roomRequest.getRecipientUsername());
+        Member member = memberService.findBySubId(sender);
+
+        // 방 조회 또는 생성
+        UUID chatRoomId = chatRoomService.getOrCreatePrivateChatRoom(member, recipient);
 
         return ResponseEntity.ok(new RoomIdResponse(chatRoomId));
     }
