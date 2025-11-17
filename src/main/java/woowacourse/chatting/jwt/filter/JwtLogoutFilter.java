@@ -15,9 +15,12 @@ import woowacourse.chatting.domain.auth.RefreshToken;
 import woowacourse.chatting.dto.ResponseDto;
 import woowacourse.chatting.jwt.JwtTokenProvider;
 import woowacourse.chatting.repository.RefreshTokeRepository;
+import woowacourse.chatting.repository.member.MemberRepository;
+import woowacourse.chatting.service.MemberService;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ public class JwtLogoutFilter extends OncePerRequestFilter {
 
     private final RefreshTokeRepository refreshTokeRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final MemberService memberService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -45,7 +49,8 @@ public class JwtLogoutFilter extends OncePerRequestFilter {
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
         Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
 
-        Member member = (Member) authentication.getPrincipal();
+        UUID subId = (UUID) authentication.getPrincipal();
+        Member member = memberService.findBySubId(subId);
 
         Optional<RefreshToken> findRefreshToken = refreshTokeRepository.findByMemberId(member.getId());
 
