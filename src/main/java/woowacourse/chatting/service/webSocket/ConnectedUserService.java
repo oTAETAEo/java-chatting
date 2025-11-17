@@ -1,13 +1,10 @@
 package woowacourse.chatting.service.webSocket;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import woowacourse.chatting.domain.member.Member;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service

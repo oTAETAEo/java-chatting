@@ -7,29 +7,35 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import woowacourse.chatting.domain.member.Member;
+import woowacourse.chatting.service.MemberService;
+import woowacourse.chatting.util.UUIDUtil;
+
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class WebSocketEventListener {
 
+    private final MemberService memberService;
     private final ConnectedUserService connectedUserService;
     private final SimpMessagingTemplate messagingTemplate;
 
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        String username = accessor.getUser().getName(); // Principal에서 이름 추출
 
-        connectedUserService.addUser(username);
+        String sessionId = accessor.getSessionId();
+        UUID subId = UUIDUtil.toUUID(accessor.getUser().getName());
+        Member member = memberService.findBySubId(subId);
+        connectedUserService.addUser(sessionId, member);
     }
 
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        String username = accessor.getUser() != null ? accessor.getUser().getName() : null;
 
-        if (username != null) {
-            connectedUserService.removeUser(username);
-        }
+        String sessionId = accessor.getSessionId();
+        connectedUserService.removeUser(sessionId);
     }
 }
