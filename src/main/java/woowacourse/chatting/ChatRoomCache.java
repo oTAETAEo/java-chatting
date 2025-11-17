@@ -23,16 +23,12 @@ public class ChatRoomCache implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        UUID publicRoomId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+        ChatRoom publicChatRoom = ChatRoom.builder()
+                .roomType(ChatRoomType.GROUP)
+                .build();
 
-        // DB에 공개방이 있으면 조회, 없으면 생성
-        publicRoom = chatRoomRepository.findById(publicRoomId)
-                .orElseGet(() -> chatRoomRepository.save(
-                        ChatRoom.builder()
-                                .id(publicRoomId)
-                                .members(Set.of())
-                                .roomType(ChatRoomType.GROUP)
-                                .build()
-                ));
+        publicRoom = publicChatRoom;
+
+        chatRoomRepository.save(publicChatRoom);
     }
 }
