@@ -313,6 +313,11 @@ body {
     color: white;
 }
 
+.friend-item-actions .block-btn {
+    background-color: #faa61a; /* A distinct color for blocking */
+    color: white;
+}
+
 .no-content-message {
     text-align: center;
     color: #a5a6ab;

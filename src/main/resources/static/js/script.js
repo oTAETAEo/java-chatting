@@ -113,13 +113,11 @@ loginForm.addEventListener('submit', async (e) => {
 
             // 🔥🔥🔥 추가된 토큰 저장 로직 🔥🔥🔥
             if (result.accessToken) {
-                // 'accessToken'이라는 키로 액세스 토큰 값을 localStorage에 저장
-                localStorage.setItem('accessToken', result.accessToken);
-                // grantType (Bearer)도 필요하다면 함께 저장하여 나중에 사용
+                sessionStorage.setItem('accessToken', result.accessToken);
                 if (result.grantType) {
-                    localStorage.setItem('grantType', result.grantType);
+                    sessionStorage.setItem('grantType', result.grantType);
                 }
-                console.log("로그인 성공! 액세스 토큰이 localStorage에 저장되었습니다.");
+                console.log("로그인 성공! 토큰이 sessionStorage에 저장되었습니다.");
             }
 
             loginMessage.textContent = `로그인 성공! ${result.message || ''}`;

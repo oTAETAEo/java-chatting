@@ -7,6 +7,7 @@ let currentChatPartner = null;
 let currentChatRoomType = 'public';
 let currentChatRoomId = null;
 let currentUserEmail = null; // Add this line
+let allFriends = []; // Global variable to store friends
 
 // --- 구독 ID 전역 관리 ---
 let publicSub = null;
@@ -70,7 +71,7 @@ function updateUserProfile(name, email) {
 }
 
 // --- 사용자 목록 표시 ---
-function renderUserList(users) {
+function renderUserList(onlineUsers, allFriends) {
     const container = document.getElementById('user-list');
     if (!container) return;
 
@@ -83,22 +84,24 @@ function renderUserList(users) {
     publicBtn.innerHTML = `<span class="status-dot" style="background-color: #7289da;"></span>공개 채널`;
     publicBtn.addEventListener('click', () => {
         startPublicChat();
-
         requestPublicHistory();
     });
     container.appendChild(publicBtn);
 
-    // --- 개별 사용자 버튼 ---
-    users.forEach(user => {
-        if (user === currentUserEmail) return; // Compare with email
+    // --- 친구 목록 ---
+    allFriends.forEach(friend => {
+        // Check if the friend is currently online
+        const isOnline = onlineUsers.includes(friend.email);
 
         const userBtn = document.createElement('button');
         userBtn.classList.add('user-item');
-        userBtn.dataset.username = user;
-        if (user === currentChatPartner) userBtn.classList.add('active');
-        userBtn.innerHTML = `<span class="status-dot"></span>${user}`;
+        userBtn.dataset.username = friend.email;
+        if (friend.email === currentChatPartner) userBtn.classList.add('active');
+
+        const statusDotColor = isOnline ? '#43b581' : '#747474'; // Green for online, gray for offline
+        userBtn.innerHTML = `<span class="status-dot" style="background-color: ${statusDotColor};"></span>${friend.name}`;
         userBtn.addEventListener('click', () => {
-            startPrivateChat(user);
+            startPrivateChat(friend.id, friend.name);
         });
         container.appendChild(userBtn);
     });
@@ -139,8 +142,8 @@ function setupSubscriptions() {
     });
 
     userListSub = stompClient.subscribe('/user/queue/users', msg => {
-        const users = JSON.parse(msg.body);
-        renderUserList(users);
+        const onlineUsers = JSON.parse(msg.body);
+        renderUserList(onlineUsers, allFriends);
     });
 
     publicRoomSub = stompClient.subscribe('/user/queue/public-room', msg => {
@@ -173,16 +176,16 @@ function setupSubscriptions() {
 }
 
 // --- 채팅 전환 ---
-function startPrivateChat(partner) {
-    document.getElementById('chat-room-name').textContent = `1:1 대화: ${partner}`;
+function startPrivateChat(partnerId, partnerName) {
+    document.getElementById('chat-room-name').textContent = `1:1 대화: ${partnerName}`;
     document.getElementById('chat-messages').innerHTML = '';
-    currentChatPartner = partner;
+    currentChatPartner = partnerId;
     currentChatRoomType = 'private';
 
     document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
-    document.querySelector(`[data-username="${partner}"]`)?.classList.add('active');
+    document.querySelector(`[data-username="${partnerId}"]`)?.classList.add('active');
 
-    const token = localStorage.getItem('accessToken');
+    const token = sessionStorage.getItem('accessToken');
     if (!token) {
         alert("로그인이 필요합니다.");
         return;
@@ -194,7 +197,7 @@ function startPrivateChat(partner) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ recipientUsername: partner })
+        body: JSON.stringify({ recipientUsername: partnerId })
     })
         .then(response => {
             if (!response.ok) throw new Error('채팅방 요청 실패');
@@ -270,8 +273,8 @@ function sendMessage() {
 
 // --- WebSocket 연결 ---
 function connectWebSocket() {
-    const accessToken = localStorage.getItem('accessToken');
-    const grantType = localStorage.getItem('grantType') || 'Bearer';
+    const accessToken = sessionStorage.getItem('accessToken');
+    const grantType = sessionStorage.getItem('grantType') || 'Bearer';
     const status = document.getElementById('status-message');
     const reconnectBtn = document.getElementById('reconnect-button');
     const sendBtn = document.getElementById('send-button');
@@ -286,9 +289,9 @@ function connectWebSocket() {
     }
 
     const decoded = decodeJwt(accessToken);
-    if (decoded?.name) {
-        currentUserName = decoded.name;
-        currentUserEmail = decoded.sub; // Set currentUserEmail here
+    if (decoded?.username) { // Changed from decoded?.name to decoded?.username
+        currentUserName = decoded.username;
+        currentUserEmail = decoded.email; // Changed from decoded.sub to decoded.email
         updateUserProfile(currentUserName, currentUserEmail);
         const usernameInput = document.getElementById('username-input');
         usernameInput.value = currentUserName;
@@ -301,12 +304,13 @@ function connectWebSocket() {
 
     const headers = { 'Authorization': `${grantType} ${accessToken}` };
 
-    stompClient.connect(headers, () => {
+    stompClient.connect(headers, async () => { // Added async here
         status.style.backgroundColor = 'green';
         sendBtn.disabled = false;
         disconnectBtn.disabled = false;
         reconnectBtn.disabled = true;
 
+        await fetchFriendData(); // Fetch friends initially
         setupSubscriptions();
         stompClient.send("/app/chat.getUsers", {}, JSON.stringify({}));
         stompClient.send('/app/chat.getPublicRoom', {});
@@ -342,6 +346,28 @@ function disconnectWebSocket() {
     }
 }
 
+// --- 로그아웃 ---
+async function logout() {
+    const accessToken = sessionStorage.getItem('accessToken');
+    const grantType = sessionStorage.getItem('grantType') || 'Bearer';
+
+    try {
+        await fetch('/logout', {
+            method: 'POST',
+            headers: {
+                'Authorization': `${grantType} ${accessToken}`
+            }
+        });
+    } catch (error) {
+        console.error('Logout API call failed:', error);
+    } finally {
+        disconnectWebSocket();
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('grantType');
+        window.location.href = '/index.html';
+    }
+}
+
 // --- 초기화 ---
 window.onload = () => {
     connectWebSocket();
@@ -351,6 +377,7 @@ window.onload = () => {
     });
     document.getElementById('disconnect-button').addEventListener('click', disconnectWebSocket);
     document.getElementById('reconnect-button').addEventListener('click', connectWebSocket);
+    document.getElementById('logout-button').addEventListener('click', logout);
 
     document.getElementById('add-friend-button').addEventListener('click', () => {
         const email = prompt('추가할 친구의 이메일을 입력하세요.');
@@ -430,7 +457,8 @@ async function fetchWithAuth(url, options = {}) {
             const newAccessToken = tokenData.accessToken;
             const newGrantType = tokenData.grantType;
 
-            localStorage.setItem('accessToken', newAccessToken);
+            sessionStorage.setItem('accessToken', newAccessToken);
+            sessionStorage.setItem('grantType', newGrantType);
             console.log("[Auth] 새로운 액세스 토큰을 발급받아 저장했습니다.");
 
             const newOptions = { ...options };
@@ -456,7 +484,7 @@ async function fetchFriendData() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`
             }
         });
 
@@ -466,6 +494,7 @@ async function fetchFriendData() {
 
         const data = await response.json();
         console.log("친구 데이터:", data);
+        allFriends = data.friends || []; // Update global allFriends variable
 
         // 보낸 요청 표시
         const sentRequestsContent = document.getElementById('sent-requests-content');
@@ -544,8 +573,18 @@ function createFriendItem(data, type, id = null) { // 'data' can be string (name
         removeButton.textContent = '삭제';
         removeButton.onclick = () => removeFriend(data.name);
         actions.appendChild(removeButton);
+
+        const blockButton = document.createElement('button');
+        blockButton.className = 'block-btn';
+        blockButton.textContent = '차단';
+        blockButton.onclick = () => {
+            if (confirm(`${data.name}님을 정말 차단하시겠습니까?`)) {
+                blockFriend(data.name);
+            }
+        };
+        actions.appendChild(blockButton);
     } else if (type === 'sent') {
-        // data is a request object: { toName, toEmail, id }
+        // data is a request object: { id, toName, toEmail }
         const info = document.createElement('div');
         info.className = 'friend-item-info';
 
@@ -555,7 +594,7 @@ function createFriendItem(data, type, id = null) { // 'data' can be string (name
 
         const itemEmail = document.createElement('div');
         itemEmail.className = 'friend-item-email';
-        itemEmail.textContent = data.email || '이메일 정보 없음';
+        itemEmail.textContent = data.toEmail || '이메일 정보 없음';
 
         info.appendChild(itemName);
         info.appendChild(itemEmail);
@@ -567,17 +606,17 @@ function createFriendItem(data, type, id = null) { // 'data' can be string (name
         cancelButton.onclick = () => cancelFriendRequest(data.id);
         actions.appendChild(cancelButton);
     } else if (type === 'received') { // New block for received requests
-        // data is a request object: { fromName, fromEmail, id } (ASSUMPTION for fromEmail)
+        // data is a request object: { id, toName, toEmail }
         const info = document.createElement('div');
         info.className = 'friend-item-info';
 
         const itemName = document.createElement('div');
         itemName.className = 'friend-item-name';
-        itemName.textContent = data.fromName;
+        itemName.textContent = data.toName;
 
         const itemEmail = document.createElement('div');
         itemEmail.className = 'friend-item-email';
-        itemEmail.textContent = data.email || '이메일 정보 없음';
+        itemEmail.textContent = data.toEmail || '이메일 정보 없음';
 
         info.appendChild(itemName);
         info.appendChild(itemEmail);
@@ -608,7 +647,7 @@ async function updateFriendRequestStatus(id, status) {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`
             },
             body: JSON.stringify({ status: status })
         });
@@ -646,9 +685,15 @@ function removeFriend(name) {
     // 여기에 친구 삭제 API 호출 로직 추가
 }
 
+function blockFriend(name) {
+    console.log(`Blocking friend: ${name}`);
+    alert(`${name}님을 차단했습니다. (API 연동 예정)`);
+    // 여기에 친구 차단 API 호출 로직 추가
+}
+
 async function addFriend(friendEmail) {
-    const accessToken = localStorage.getItem('accessToken');
-    const grantType = localStorage.getItem('grantType') || 'Bearer';
+    const accessToken = sessionStorage.getItem('accessToken');
+    const grantType = sessionStorage.getItem('grantType') || 'Bearer';
 
     if (!accessToken) {
         alert('로그인이 필요합니다.');
