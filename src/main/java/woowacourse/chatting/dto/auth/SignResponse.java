@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-public class ResponseToken {
+public class SignResponse {
     private final String grantType;
     private final String accessToken;
 }
