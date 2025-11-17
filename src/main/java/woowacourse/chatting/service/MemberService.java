@@ -4,6 +4,8 @@ import woowacourse.chatting.domain.member.FriendRelation;
 import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.dto.AddMemberRequest;
 
+import java.util.UUID;
+
 
 public interface MemberService {
 
@@ -14,4 +16,6 @@ public interface MemberService {
     Long save(AddMemberRequest dto);
 
     FriendRelation addFriend(Member member, String friendEmail);
+
+    Member findBySubId(UUID subId);
 }

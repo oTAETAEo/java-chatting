@@ -22,6 +22,9 @@ public class Member implements UserDetails {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    private UUID subId;
+
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
@@ -43,6 +46,7 @@ public class Member implements UserDetails {
         this.email = email;
         this.name = name;
         this.password = password;
+        this.subId = UUID.randomUUID();
     }
 
     @Override

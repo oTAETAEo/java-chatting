@@ -13,6 +13,9 @@ import woowacourse.chatting.dto.chat.FriendRequestStatusDto;
 import woowacourse.chatting.dto.chat.FriendsResponse;
 import woowacourse.chatting.service.MemberService;
 import woowacourse.chatting.service.chat.FriendRelationService;
+import woowacourse.chatting.util.UUIDUtil;
+
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -23,15 +26,17 @@ public class MemberController {
     private final FriendRelationService friendRelationService;
 
     @PostMapping("/add/friend")
-    public ResponseEntity<?> addFriend(@AuthenticationPrincipal Member member, @RequestBody AddFriendDto friendDto) {
-        FriendRelation friendRelation = memberService.addFriend(member, friendDto.getFriendEmail());
+    public ResponseEntity<?> addFriend(@AuthenticationPrincipal UUID memberSubId, @RequestBody AddFriendDto friendDto) {
+        Member findMember = memberService.findBySubId(memberSubId);
+        FriendRelation friendRelation = memberService.addFriend(findMember, friendDto.getFriendEmail());
         friendRelationService.friendRequest(friendRelation);
         return ResponseEntity.ok().body(new ResponseDto("친구요청 완료."));
     }
 
     @GetMapping("/friends")
-    public ResponseEntity<?> getFriendRequest(@AuthenticationPrincipal Member member){
-        FriendsResponse allFriendRequest = friendRelationService.getAllFriendRequest(member);
+    public ResponseEntity<?> getFriendRequest(@AuthenticationPrincipal UUID memberSubId){
+        Member findMember = memberService.findBySubId(memberSubId);
+        FriendsResponse allFriendRequest = friendRelationService.getAllFriendRequest(findMember);
         return ResponseEntity.ok()
                 .body(allFriendRequest);
     }
@@ -40,8 +45,9 @@ public class MemberController {
     public ResponseEntity<?> friendRequestSuccess(
             @RequestBody FriendRequestStatusDto statusDto,
             @PathVariable Long id,
-            @AuthenticationPrincipal Member member) {
+            @AuthenticationPrincipal UUID memberSubId) {
 
+        Member member = memberService.findBySubId(memberSubId);
         friendRelationService.friendStatusHandle(member, statusDto.getStatus(), id);
 
         return ResponseEntity.ok().build();

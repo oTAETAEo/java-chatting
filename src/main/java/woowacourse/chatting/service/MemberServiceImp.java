@@ -12,6 +12,7 @@ import woowacourse.chatting.dto.AddMemberRequest;
 import woowacourse.chatting.repository.member.MemberRepository;
 
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -36,11 +37,20 @@ public class MemberServiceImp implements MemberService {
 
     @Override
     public FriendRelation addFriend(Member my, String friendEmail) {
+
+        Member findMember = findByEmailMember(friendEmail);
+
         return FriendRelation.builder()
                 .from(my)
-                .to(findByEmailMember(friendEmail))
+                .to(findMember)
                 .status(FriendStatus.REQUESTED)
                 .build();
+    }
+
+    @Override
+    public Member findBySubId(UUID subId) {
+        return memberRepository.findBySubId(subId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자 입니다."));
     }
 
     public Long save(AddMemberRequest dto) {
