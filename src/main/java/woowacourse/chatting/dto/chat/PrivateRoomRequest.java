@@ -2,7 +2,9 @@ package woowacourse.chatting.dto.chat;
 
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class PrivateRoomRequest {
-    private String recipientUsername;
+    private UUID recipientUsername;
 }
