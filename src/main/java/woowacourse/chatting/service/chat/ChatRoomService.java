@@ -2,27 +2,28 @@ package woowacourse.chatting.service.chat;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import woowacourse.chatting.ChatRoomCache;
+import woowacourse.chatting.domain.chat.ChatRoomMember;
 import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.domain.chat.ChatRoom;
 import woowacourse.chatting.domain.chat.ChatRoomType;
+import woowacourse.chatting.repository.chat.ChatRoomMemberRepository;
 import woowacourse.chatting.repository.chat.ChatRoomRepository;
-import woowacourse.chatting.service.MemberService;
 
-import java.util.Set;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ChatRoomService {
 
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomCache chatRoomCache;
 
-    private final MemberService memberService;
-
-    public ChatRoom findChatRoom(String roomId) {
-        return chatRoomRepository.findById(UUID.fromString(roomId))
+    public ChatRoom findChatRoom(UUID roomId) {
+        return chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 입니다."));
     }
 
@@ -30,25 +31,34 @@ public class ChatRoomService {
         return chatRoomCache.getPublicRoom();
     }
 
-    public ChatRoom createPrivateChatRoom(Member member1, Member member2) {
-        return ChatRoom.builder()
-                .id(UUID.randomUUID())
-                .members(Set.of(member1, member2))
+    @Transactional
+    public UUID getOrCreatePrivateChatRoom(Member sender, Member recipient) {
+
+        // 1. 기존 방 조회
+        Optional<ChatRoom> existingRoom = chatRoomRepository
+                .findPrivateRoomByMembers(sender, recipient);
+
+        if (existingRoom.isPresent()) {
+            return existingRoom.get().getId();
+        }
+
+        // 2. 새 방 생성
+        ChatRoom chatRoom = ChatRoom.builder()
                 .roomType(ChatRoomType.PRIVATE)
                 .build();
-    }
+        chatRoomRepository.save(chatRoom);
 
-    public UUID findPrivateChatRoomIdByMemberEmail(String email1, String email2, ChatRoomType type){
-        ChatRoom chatRoom = chatRoomRepository.findByUsers(email1, email2, type)
-                .orElseGet(() -> savePrivateChatRoom(email1, email2));
+        // 3. ChatRoomMember 추가
+        chatRoomMemberRepository.save(ChatRoomMember.builder()
+                .chatRoom(chatRoom)
+                .member(sender)
+                .build());
+
+        chatRoomMemberRepository.save(ChatRoomMember.builder()
+                .chatRoom(chatRoom)
+                .member(recipient)
+                .build());
+
         return chatRoom.getId();
-    }
-
-    private ChatRoom savePrivateChatRoom(String email1, String email2) {
-        Member recipientMember = memberService.findByEmailMember(email1);
-        Member senderMember = memberService.findByEmailMember(email2);
-        ChatRoom privateChatRoom = createPrivateChatRoom(recipientMember, senderMember);
-        chatRoomRepository.save(privateChatRoom);
-        return privateChatRoom;
     }
 }
