@@ -10,7 +10,7 @@ import woowacourse.chatting.repository.member.MemberRepository;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class MemberDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
@@ -18,6 +18,6 @@ public class MemberDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 사용자 입니다 : " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("등록되지 않은 사용자 입니다 : " + email));
     }
 }
