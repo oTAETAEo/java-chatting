@@ -43,37 +43,37 @@
         <section id="chat-messages"></section>
 
         <div id="chat-input">
-            <input id="username-input" disabled placeholder="사용자 이름" />
-            <input id="message-input" placeholder="메시지를 입력하세요..." />
+            <input id="username-input" disabled placeholder="사용자 이름"/>
+            <input id="message-input" placeholder="메시지를 입력하세요..."/>
             <button id="send-button">전송</button>
         </div>
         <p id="api-result-message"></p>
 
 
-    <div id="friend-management-backdrop" class="hidden"></div>
-    <div id="friend-management-view" class="hidden">
-        <div class="friend-view-header">
-            <h3>친구 관리</h3>
-            <button id="close-friend-view-button">X</button>
-        </div>
-        <div class="friend-view-tabs">
-            <button class="tab-button active" data-tab="sent-requests">보낸 요청</button>
-            <button class="tab-button" data-tab="received-requests">받은 요청</button>
-            <button class="tab-button" data-tab="all-friends">모든 친구</button>
-        </div>
-        <div class="friend-view-content">
-            <div id="sent-requests-content" class="tab-content active">
-                <!-- Content for sent requests will go here -->
+        <div id="friend-management-backdrop" class="hidden"></div>
+        <div id="friend-management-view" class="hidden">
+            <div class="friend-view-header">
+                <h3>친구 관리</h3>
+                <button id="close-friend-view-button">X</button>
             </div>
-            <div id="received-requests-content" class="tab-content">
-                <!-- Content for received requests will go here -->
+            <div class="friend-view-tabs">
+                <button class="tab-button active" data-tab="sent-requests">보낸 요청</button>
+                <button class="tab-button" data-tab="received-requests">받은 요청</button>
+                <button class="tab-button" data-tab="all-friends">모든 친구</button>
             </div>
-            <div id="all-friends-content" class="tab-content">
-                <!-- Content for all friends will go here -->
+            <div class="friend-view-content">
+                <div id="sent-requests-content" class="tab-content active">
+                    <!-- Content for sent requests will go here -->
+                </div>
+                <div id="received-requests-content" class="tab-content">
+                    <!-- Content for received requests will go here -->
+                </div>
+                <div id="all-friends-content" class="tab-content">
+                    <!-- Content for all friends will go here -->
+                </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>

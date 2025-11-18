@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import woowacourse.chatting.domain.chat.PresenceStatus;
 import woowacourse.chatting.domain.member.FriendRelation;
 import woowacourse.chatting.domain.member.FriendStatus;
 import woowacourse.chatting.domain.member.Member;
@@ -28,25 +27,25 @@ public class FriendRelationService {
     private final SimpMessagingTemplate messagingTemplate;
     private final FriendRelationRepository friendRelationRepository;
 
-    public synchronized void friendRequest(FriendRelation friendRelation){
+    public synchronized void friendRequest(FriendRelation friendRelation) {
         friendRelationRepository.findFriendRelationBetween(
-                friendRelation.getFrom().getId(), friendRelation.getTo().getId())
+                        friendRelation.getFrom().getId(), friendRelation.getTo().getId())
                 .ifPresentOrElse((f) -> {
-                    if (f.getStatus().equals(FriendStatus.REJECTED)){
+                    if (f.getStatus().equals(FriendStatus.REJECTED)) {
                         f.changeFriendStatus(FriendStatus.REQUESTED);
                     }
                 }, () -> friendRelationRepository.save(friendRelation));
     }
 
-    public FriendsResponse getAllFriendRequest(Member member){
+    public FriendsResponse getAllFriendRequest(Member member) {
 
         List<FriendResponseDto> sent = friendRelationRepository.findAllSentFriendRequests(member.getId());
         List<FriendResponseDto> received = friendRelationRepository.findAllReceivedFriendRequests(member.getId());
         List<FriendDto> friends = friendRelationRepository.findFriendList(member.getId());
         friends
-            .forEach((f) -> {
-                f.setStatus(connectedUserService.containsFriend(f.getId()));
-            });
+                .forEach((f) -> {
+                    f.setStatus(connectedUserService.containsFriend(f.getId()));
+                });
 
         return FriendsResponse.builder()
                 .sentFriendRequests(sent)
@@ -59,7 +58,7 @@ public class FriendRelationService {
         FriendRelation friendRelation = friendRelationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 친구추가 입니다."));
 
-        if(!friendRelation.getTo().getId().equals(member.getId())){
+        if (!friendRelation.getTo().getId().equals(member.getId())) {
             throw new IllegalArgumentException("권한 없음");
         }
 

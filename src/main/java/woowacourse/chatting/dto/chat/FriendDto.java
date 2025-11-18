@@ -20,6 +20,7 @@ public class FriendDto {
         this.email = email;
         this.status = PresenceStatus.OFFLINE;
     }
+
     public FriendDto() {
     }
 }

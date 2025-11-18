@@ -10,12 +10,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.filter.OncePerRequestFilter;
-import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.domain.auth.RefreshToken;
+import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.dto.ResponseDto;
 import woowacourse.chatting.jwt.JwtTokenProvider;
 import woowacourse.chatting.repository.RefreshTokeRepository;
-import woowacourse.chatting.repository.member.MemberRepository;
 import woowacourse.chatting.service.MemberService;
 
 import java.io.IOException;

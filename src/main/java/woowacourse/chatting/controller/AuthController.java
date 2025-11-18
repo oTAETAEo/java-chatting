@@ -9,11 +9,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.dto.AddMemberRequest;
 import woowacourse.chatting.dto.ResponseDto;
-import woowacourse.chatting.dto.auth.SignResponse;
 import woowacourse.chatting.dto.auth.SignInDto;
+import woowacourse.chatting.dto.auth.SignResponse;
 import woowacourse.chatting.jwt.JwtToken;
 import woowacourse.chatting.service.AuthService;
 import woowacourse.chatting.service.MemberServiceImp;
@@ -47,9 +46,9 @@ public class AuthController {
 
         return ResponseEntity.ok().body(
                 SignResponse.builder()
-                .grantType(jwtToken.getGrantType())
-                .accessToken(jwtToken.getAccessToken())
-                .build()
+                        .grantType(jwtToken.getGrantType())
+                        .accessToken(jwtToken.getAccessToken())
+                        .build()
         );
     }
 }

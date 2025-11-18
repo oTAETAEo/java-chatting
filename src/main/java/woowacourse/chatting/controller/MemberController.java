@@ -13,7 +13,6 @@ import woowacourse.chatting.dto.chat.FriendRequestStatusDto;
 import woowacourse.chatting.dto.chat.FriendsResponse;
 import woowacourse.chatting.service.MemberService;
 import woowacourse.chatting.service.chat.FriendRelationService;
-import woowacourse.chatting.util.UUIDUtil;
 
 import java.util.UUID;
 
@@ -34,7 +33,7 @@ public class MemberController {
     }
 
     @GetMapping("/friends")
-    public ResponseEntity<?> getFriendRequest(@AuthenticationPrincipal UUID memberSubId){
+    public ResponseEntity<?> getFriendRequest(@AuthenticationPrincipal UUID memberSubId) {
         Member findMember = memberService.findBySubId(memberSubId);
         FriendsResponse allFriendRequest = friendRelationService.getAllFriendRequest(findMember);
         return ResponseEntity.ok()

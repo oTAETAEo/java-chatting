@@ -4,7 +4,8 @@ import java.util.UUID;
 
 public class UUIDUtil {
 
-    private UUIDUtil() {} // 인스턴스화 방지
+    private UUIDUtil() {
+    } // 인스턴스화 방지
 
     public static UUID toUUID(String uuidString) {
         try {

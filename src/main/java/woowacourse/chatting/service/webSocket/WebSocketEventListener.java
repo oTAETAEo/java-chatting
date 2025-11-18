@@ -36,7 +36,7 @@ public class WebSocketEventListener {
         connectedUserService.addUser(sessionId, member);
 
         List<FriendDto> friends = friendRelationRepository.findFriendList(member.getId());
-        for (FriendDto f: friends) {
+        for (FriendDto f : friends) {
             messagingTemplate.convertAndSendToUser(
                     f.getId().toString(),
                     "/queue/friend/connect",
@@ -53,7 +53,7 @@ public class WebSocketEventListener {
         Member member = memberService.findBySubId(subId);
 
         List<FriendDto> friends = friendRelationRepository.findFriendList(member.getId());
-        for (FriendDto f: friends) {
+        for (FriendDto f : friends) {
             messagingTemplate.convertAndSendToUser(
                     f.getId().toString(),
                     "/queue/friend/connect",

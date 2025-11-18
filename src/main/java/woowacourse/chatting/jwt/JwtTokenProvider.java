@@ -10,12 +10,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.domain.auth.RefreshToken;
+import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.exception.jwt.JwtValidationException;
 import woowacourse.chatting.service.MemberService;
 import woowacourse.chatting.service.RefreshTokeService;
@@ -40,7 +38,7 @@ public class JwtTokenProvider {
     private final MemberService memberService;
 
     /**
-     * @param secretKey:         @Value("$jwt.secret")는 .yml에 저장 되어있는 key를 주입한다.
+     * @param secretKey: @Value("$jwt.secret")는 .yml에 저장 되어있는 key를 주입한다.
      */
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, RefreshTokeService refreshTokeService, MemberService memberService) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);

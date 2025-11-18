@@ -9,9 +9,6 @@ import woowacourse.chatting.domain.chat.ChatRoom;
 import woowacourse.chatting.domain.chat.ChatRoomType;
 import woowacourse.chatting.repository.chat.ChatRoomRepository;
 
-import java.util.Set;
-import java.util.UUID;
-
 @Component
 @RequiredArgsConstructor
 public class ChatRoomCache implements ApplicationRunner {

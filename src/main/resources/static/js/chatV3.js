@@ -93,20 +93,21 @@ function renderUserList(onlineUsers, allFriends) {
     // --- 친구 목록 ---
     allFriends.forEach(friend => {
         // Check if the friend is currently online
-                    let isOnline = false;
-                    if (friend.status) {
-                    isOnline = (friend.status.toUpperCase() === 'ONLINE'); // 대소문자 구분 없이 'ONLINE'인지 확인
-                    } else {
-                        isOnline = onlineUsers.includes(friend.email); // Fallback to existing onlineUsers check
-                    }
-        
-                    const userBtn = document.createElement('button');
-                    userBtn.classList.add('user-item');
-                    userBtn.dataset.username = friend.email;
-                    if (friend.email === currentChatPartner) userBtn.classList.add('active');
-        
-                    const statusDotColor = isOnline ? '#43b581' : '#747474'; // Green for online, gray for offline
-                    userBtn.innerHTML = `<span class="status-dot" style="background-color: ${statusDotColor};"></span>${friend.name}`;        userBtn.addEventListener('click', () => {
+        let isOnline = false;
+        if (friend.status) {
+            isOnline = (friend.status.toUpperCase() === 'ONLINE'); // 대소문자 구분 없이 'ONLINE'인지 확인
+        } else {
+            isOnline = onlineUsers.includes(friend.email); // Fallback to existing onlineUsers check
+        }
+
+        const userBtn = document.createElement('button');
+        userBtn.classList.add('user-item');
+        userBtn.dataset.username = friend.email;
+        if (friend.email === currentChatPartner) userBtn.classList.add('active');
+
+        const statusDotColor = isOnline ? '#43b581' : '#747474'; // Green for online, gray for offline
+        userBtn.innerHTML = `<span class="status-dot" style="background-color: ${statusDotColor};"></span>${friend.name}`;
+        userBtn.addEventListener('click', () => {
             startPrivateChat(friend.id, friend.name);
         });
         container.appendChild(userBtn);
@@ -194,7 +195,7 @@ function setupSubscriptions() {
 
     friendConnectSub = stompClient.subscribe('/user/queue/friend/connect', msg => {
         const connectData = JSON.parse(msg.body);
-        const { subId, status } = connectData;
+        const {subId, status} = connectData;
 
         const friendToUpdate = allFriends.find(friend => friend.id === subId);
 
@@ -231,14 +232,14 @@ function startPrivateChat(partnerId, partnerName) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ recipientUsername: partnerId })
+        body: JSON.stringify({recipientUsername: partnerId})
     })
         .then(response => {
             if (!response.ok) throw new Error('채팅방 요청 실패');
             return response.json();
         })
         .then(data => {
-            const { roomId } = data;
+            const {roomId} = data;
             currentChatRoomId = roomId;
             subscribeToPrivateRoom(roomId);
         })
@@ -292,7 +293,7 @@ function sendMessage() {
     if (!message || !stompClient || !stompClient.connected) return;
 
     if (currentChatRoomType === 'public') {
-        stompClient.send("/app/public", {}, JSON.stringify({ sender: currentUserName, content: message }));
+        stompClient.send("/app/public", {}, JSON.stringify({sender: currentUserName, content: message}));
     } else if (currentChatRoomType === 'private') {
         stompClient.send(`/app/private/${currentChatRoomId}`, {}, JSON.stringify({
             recipient: currentChatPartner,
@@ -336,7 +337,7 @@ function connectWebSocket() {
     stompClient = Stomp.over(socket);
     stompClient.debug = null;
 
-    const headers = { 'Authorization': `${grantType} ${accessToken}` };
+    const headers = {'Authorization': `${grantType} ${accessToken}`};
 
     stompClient.connect(headers, async () => { // Added async here
         status.style.backgroundColor = 'green';
@@ -485,8 +486,10 @@ async function fetchWithAuth(url, options = {}) {
         console.log("[Auth] 401 Unauthorized. 토큰 재발급을 시도합니다.");
 
         try {
-            const refreshResponse = await fetch('/jwt/refresh', { method: 'GET' });
-            if (!refreshResponse.ok) { throw new Error('토큰 재발급에 실패했습니다.'); }
+            const refreshResponse = await fetch('/jwt/refresh', {method: 'GET'});
+            if (!refreshResponse.ok) {
+                throw new Error('토큰 재발급에 실패했습니다.');
+            }
 
             const tokenData = await refreshResponse.json();
             const newAccessToken = tokenData.accessToken;
@@ -496,8 +499,8 @@ async function fetchWithAuth(url, options = {}) {
             sessionStorage.setItem('grantType', newGrantType);
             console.log("[Auth] 새로운 액세스 토큰을 발급받아 저장했습니다.");
 
-            const newOptions = { ...options };
-            newOptions.headers = { ...options.headers };
+            const newOptions = {...options};
+            newOptions.headers = {...options.headers};
             newOptions.headers['Authorization'] = `${newGrantType} ${newAccessToken}`;
 
             console.log("[Auth] 새로운 토큰으로 원래 요청을 재시도합니다.");
@@ -662,7 +665,7 @@ function createFriendItem(data, type, id = null) { // 'data' can be string (name
         acceptButton.className = 'accept-btn';
         acceptButton.textContent = '수락';
         acceptButton.onclick = () => acceptFriendRequest(data.id);
-        
+
         const declineButton = document.createElement('button');
         declineButton.className = 'decline-btn';
         declineButton.textContent = '거절';
@@ -675,6 +678,7 @@ function createFriendItem(data, type, id = null) { // 'data' can be string (name
     item.appendChild(actions);
     return item;
 }
+
 // --- 친구 관련 액션 핸들러 ---
 
 async function updateFriendRequestStatus(id, status) {
@@ -685,7 +689,7 @@ async function updateFriendRequestStatus(id, status) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`
             },
-            body: JSON.stringify({ status: status })
+            body: JSON.stringify({status: status})
         });
 
         if (!response.ok) {
@@ -742,7 +746,7 @@ async function addFriend(friendEmail) {
             'Content-Type': 'application/json',
             'Authorization': `${grantType} ${accessToken}`
         },
-        body: JSON.stringify({ friendEmail: friendEmail })
+        body: JSON.stringify({friendEmail: friendEmail})
     });
 
     if (response.ok) {

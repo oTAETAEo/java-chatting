@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import woowacourse.chatting.dto.chat.MessageResponse;
 import woowacourse.chatting.repository.chat.ChatMessageRepository;
 
-
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;

@@ -181,14 +181,14 @@ function startPrivateChat(partner) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ recipientUsername: partner })
+        body: JSON.stringify({recipientUsername: partner})
     })
         .then(response => {
             if (!response.ok) throw new Error('채팅방 요청 실패');
             return response.json();
         })
         .then(data => {
-            const { roomId } = data;
+            const {roomId} = data;
             currentChatRoomId = roomId;
             subscribeToPrivateRoom(roomId);
         })
@@ -242,7 +242,7 @@ function sendMessage() {
     if (!message || !stompClient || !stompClient.connected) return;
 
     if (currentChatRoomType === 'public') {
-        stompClient.send("/app/public", {}, JSON.stringify({ sender: currentUserName, content: message }));
+        stompClient.send("/app/public", {}, JSON.stringify({sender: currentUserName, content: message}));
     } else if (currentChatRoomType === 'private') {
         stompClient.send(`/app/private/${currentChatRoomId}`, {}, JSON.stringify({
             recipient: currentChatPartner,
@@ -284,7 +284,7 @@ function connectWebSocket() {
     stompClient = Stomp.over(socket);
     stompClient.debug = null;
 
-    const headers = { 'Authorization': `${grantType} ${accessToken}` };
+    const headers = {'Authorization': `${grantType} ${accessToken}`};
 
     stompClient.connect(headers, () => {
         status.textContent = `🟢 연결됨: ${currentUserName}`;

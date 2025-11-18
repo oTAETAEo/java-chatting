@@ -30,8 +30,8 @@ public class ConnectedUserService {
         return connectedUsers.get(sessionId);
     }
 
-    public PresenceStatus containsFriend(UUID subId){
-        if(onlineUserIds.contains(subId)){
+    public PresenceStatus containsFriend(UUID subId) {
+        if (onlineUserIds.contains(subId)) {
             return PresenceStatus.ONLINE;
         }
         return PresenceStatus.OFFLINE;

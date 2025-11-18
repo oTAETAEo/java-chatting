@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woowacourse.chatting.ChatRoomCache;
-import woowacourse.chatting.domain.chat.ChatRoomMember;
-import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.domain.chat.ChatRoom;
+import woowacourse.chatting.domain.chat.ChatRoomMember;
 import woowacourse.chatting.domain.chat.ChatRoomType;
+import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.repository.chat.ChatRoomMemberRepository;
 import woowacourse.chatting.repository.chat.ChatRoomRepository;
 
