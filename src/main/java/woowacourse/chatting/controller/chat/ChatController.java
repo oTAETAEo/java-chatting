@@ -96,16 +96,4 @@ public class ChatController {
         );
     }
 
-    @MessageMapping("/chat.getUsers")
-    public void getUsers(Principal principal) {
-        // 현재 접속자 목록 조회
-        List<String> users = connectedUserService.getConnectedUsernames();
-
-        // 요청한 사용자에게만 전송
-        messagingTemplate.convertAndSendToUser(
-                principal.getName(),
-                "/queue/users",
-                users);
-    }
-
 }
