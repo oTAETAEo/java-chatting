@@ -8,6 +8,7 @@ let currentChatRoomType = 'public';
 let currentChatRoomId = null;
 let currentUserEmail = null; // Add this line
 let allFriends = []; // Global variable to store friends
+let onlineUsersCache = []; // 온라인 사용자 목록 캐시
 
 // --- 구독 ID 전역 관리 ---
 let publicSub = null;
@@ -15,6 +16,7 @@ let privateSub = null;
 let userListSub = null;
 let historySub = null;
 let publicRoomSub = null;
+let friendConnectSub = null; // 친구 연결 상태 구독
 
 // ✅ 구독 초기화 플래그
 let subscriptionsInitialized = false;
@@ -91,16 +93,20 @@ function renderUserList(onlineUsers, allFriends) {
     // --- 친구 목록 ---
     allFriends.forEach(friend => {
         // Check if the friend is currently online
-        const isOnline = onlineUsers.includes(friend.email);
-
-        const userBtn = document.createElement('button');
-        userBtn.classList.add('user-item');
-        userBtn.dataset.username = friend.email;
-        if (friend.email === currentChatPartner) userBtn.classList.add('active');
-
-        const statusDotColor = isOnline ? '#43b581' : '#747474'; // Green for online, gray for offline
-        userBtn.innerHTML = `<span class="status-dot" style="background-color: ${statusDotColor};"></span>${friend.name}`;
-        userBtn.addEventListener('click', () => {
+                    let isOnline = false;
+                    if (friend.status) {
+                    isOnline = (friend.status.toUpperCase() === 'ONLINE'); // 대소문자 구분 없이 'ONLINE'인지 확인
+                    } else {
+                        isOnline = onlineUsers.includes(friend.email); // Fallback to existing onlineUsers check
+                    }
+        
+                    const userBtn = document.createElement('button');
+                    userBtn.classList.add('user-item');
+                    userBtn.dataset.username = friend.email;
+                    if (friend.email === currentChatPartner) userBtn.classList.add('active');
+        
+                    const statusDotColor = isOnline ? '#43b581' : '#747474'; // Green for online, gray for offline
+                    userBtn.innerHTML = `<span class="status-dot" style="background-color: ${statusDotColor};"></span>${friend.name}`;        userBtn.addEventListener('click', () => {
             startPrivateChat(friend.id, friend.name);
         });
         container.appendChild(userBtn);
@@ -129,6 +135,7 @@ function setupSubscriptions() {
     userListSub?.unsubscribe();
     historySub?.unsubscribe();
     publicRoomSub?.unsubscribe();
+    friendConnectSub?.unsubscribe();
 
     // --- 새 구독 설정 ---
     publicSub = stompClient.subscribe(`/topic/public/${currentChatRoomId}`, msg => {
@@ -142,8 +149,21 @@ function setupSubscriptions() {
     });
 
     userListSub = stompClient.subscribe('/user/queue/users', msg => {
-        const onlineUsers = JSON.parse(msg.body);
-        renderUserList(onlineUsers, allFriends);
+        const data = JSON.parse(msg.body);
+
+        if (Array.isArray(data)) {
+            // 온라인 사용자 목록이 도착한 경우
+            onlineUsersCache = data;
+            renderUserList(onlineUsersCache, allFriends);
+        } else if (typeof data === 'object' && data.id && data.name) {
+            // 새로운 친구 정보가 도착한 경우
+            // 중복 추가 방지
+            if (!allFriends.some(friend => friend.id === data.id)) {
+                allFriends.push(data);
+            }
+            // 캐시된 온라인 사용자 목록과 업데이트된 친구 목록으로 사이드바를 다시 렌더링
+            renderUserList(onlineUsersCache, allFriends);
+        }
     });
 
     publicRoomSub = stompClient.subscribe('/user/queue/public-room', msg => {
@@ -170,6 +190,20 @@ function setupSubscriptions() {
 
         const type = (currentChatRoomType === 'public') ? 'public' : 'private';
         messages.forEach(data => displayMessage(data.sender, data.content, type));
+    });
+
+    friendConnectSub = stompClient.subscribe('/user/queue/friend/connect', msg => {
+        const connectData = JSON.parse(msg.body);
+        const { subId, status } = connectData;
+
+        const friendToUpdate = allFriends.find(friend => friend.id === subId);
+
+        if (friendToUpdate) {
+            friendToUpdate.status = status;
+            renderUserList(onlineUsersCache, allFriends);
+        } else {
+            alert(`디버그: ID '${subId}'에 해당하는 친구를 찾지 못했습니다.`);
+        }
     });
 
     subscriptionsInitialized = true;
@@ -333,8 +367,9 @@ function disconnectWebSocket() {
         userListSub?.unsubscribe();
         historySub?.unsubscribe();
         publicRoomSub?.unsubscribe();
+        friendConnectSub?.unsubscribe();
 
-        publicSub = privateSub = userListSub = historySub = publicRoomSub = null;
+        publicSub = privateSub = userListSub = historySub = publicRoomSub = friendConnectSub = null;
         subscriptionsInitialized = false;
 
         stompClient.disconnect(() => {
@@ -495,6 +530,7 @@ async function fetchFriendData() {
         const data = await response.json();
         console.log("친구 데이터:", data);
         allFriends = data.friends || []; // Update global allFriends variable
+        renderUserList(onlineUsersCache, allFriends); // ✅ 친구 데이터 로드 후 사이드바 갱신
 
         // 보낸 요청 표시
         const sentRequestsContent = document.getElementById('sent-requests-content');
