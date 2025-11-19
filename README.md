@@ -75,11 +75,10 @@
         아이디  : 1@1
         비밀번호 : 1111
 
-<img width="1080" height="647" alt="Image" src="https://github.com/user-attachments/assets/ecebbdab-339f-48b3-8390-904cb6eed822" />
 
-<img width="1078" height="642" alt="Image" src="https://github.com/user-attachments/assets/95c0daf9-b091-4f13-870d-0c7cb314eeef" />
+<img width="1078" height="601" alt="Image" src="https://github.com/user-attachments/assets/b310b54b-ac9b-42af-abce-f7a0f0d402ca" />
 
-
+<img width="1077" height="601" alt="Image" src="https://github.com/user-attachments/assets/1c3c3ff5-e5cd-4962-a843-60b5b633fdcd" />
 
 
 
