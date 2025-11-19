@@ -1,4 +1,4 @@
-package woowacourse.chatting.domain;
+package woowacourse.chatting.domain.auth;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

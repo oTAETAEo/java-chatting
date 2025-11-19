@@ -5,11 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import woowacourse.chatting.domain.Member;
+import woowacourse.chatting.domain.member.FriendRelation;
+import woowacourse.chatting.domain.member.FriendStatus;
+import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.dto.AddMemberRequest;
-import woowacourse.chatting.repository.MemberRepository;
+import woowacourse.chatting.repository.member.MemberRepository;
 
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -21,7 +24,7 @@ public class MemberServiceImp implements MemberService {
     private final BCryptPasswordEncoder encoder;
 
     @Override
-    public Member findMember(Long memberId) {
+    public Member findById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자 입니다."));
     }
@@ -31,6 +34,25 @@ public class MemberServiceImp implements MemberService {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자 입니다."));
     }
+
+    @Override
+    public FriendRelation addFriend(Member my, String friendEmail) {
+
+        Member findMember = findByEmailMember(friendEmail);
+
+        return FriendRelation.builder()
+                .from(my)
+                .to(findMember)
+                .status(FriendStatus.REQUESTED)
+                .build();
+    }
+
+    @Override
+    public Member findBySubId(UUID subId) {
+        return memberRepository.findBySubId(subId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자 입니다."));
+    }
+
     public Long save(AddMemberRequest dto) {
         duplicateMember(dto);
 
@@ -42,6 +64,7 @@ public class MemberServiceImp implements MemberService {
 
         memberRepository.save(member);
         return member.getId();
+
     }
 
     private void duplicateMember(AddMemberRequest dto) {

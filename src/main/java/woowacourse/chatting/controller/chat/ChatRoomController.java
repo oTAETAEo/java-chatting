@@ -7,16 +7,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import woowacourse.chatting.domain.Member;
-import woowacourse.chatting.domain.message.ChatRoom;
-import woowacourse.chatting.domain.message.ChatRoomType;
-import woowacourse.chatting.dto.message.PrivateRoomRequest;
-import woowacourse.chatting.dto.message.PrivateRoomResponse;
-import woowacourse.chatting.repository.message.ChatRoomRepository;
+import woowacourse.chatting.domain.member.Member;
+import woowacourse.chatting.dto.chat.PrivateRoomRequest;
+import woowacourse.chatting.dto.chat.RoomIdResponse;
 import woowacourse.chatting.service.MemberService;
+import woowacourse.chatting.service.chat.ChatRoomService;
 
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -24,23 +20,21 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ChatRoomController {
 
-    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomService chatRoomService;
     private final MemberService memberService;
 
     @PostMapping("/api/chat/private-room")
-    public ResponseEntity<?> getPrivateChatRoomId(@RequestBody PrivateRoomRequest roomRequest, @AuthenticationPrincipal Member member){
-        Optional<ChatRoom> findChatRoom = chatRoomRepository.findByUsers(member.getEmail(), roomRequest.getRecipientUsername(), ChatRoomType.PRIVATE);
+    public ResponseEntity<RoomIdResponse> getPrivateChatRoomId(
+            @RequestBody PrivateRoomRequest roomRequest,
+            @AuthenticationPrincipal UUID sender) {
 
-        if (findChatRoom.isPresent()){
-            return ResponseEntity.ok(new PrivateRoomResponse(findChatRoom.get().getId()));
-        }
+        Member recipient = memberService.findBySubId(roomRequest.getRecipientUsername());
+        Member member = memberService.findBySubId(sender);
 
-        Member recipientMember = memberService.findByEmailMember(roomRequest.getRecipientUsername());
-        Member senderMember = memberService.findMember(member.getId());
-        ChatRoom createChatRoom = new ChatRoom(UUID.randomUUID(), Set.of(recipientMember, senderMember), ChatRoomType.PRIVATE);
-        chatRoomRepository.save(createChatRoom);
+        // 방 조회 또는 생성
+        UUID chatRoomId = chatRoomService.getOrCreatePrivateChatRoom(member, recipient);
 
-        return ResponseEntity.ok(new PrivateRoomResponse(createChatRoom.getId()));
+        return ResponseEntity.ok(new RoomIdResponse(chatRoomId));
     }
 }
 

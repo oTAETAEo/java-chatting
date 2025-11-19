@@ -1,4 +1,4 @@
-package woowacourse.chatting.dto;
+package woowacourse.chatting.dto.auth;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

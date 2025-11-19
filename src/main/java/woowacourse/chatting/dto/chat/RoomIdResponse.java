@@ -1,4 +1,4 @@
-package woowacourse.chatting.dto.message;
+package woowacourse.chatting.dto.chat;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,6 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PrivateRoomResponse {
+public class RoomIdResponse {
     private UUID roomId;
 }

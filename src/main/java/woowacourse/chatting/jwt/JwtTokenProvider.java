@@ -9,19 +9,22 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import woowacourse.chatting.domain.Member;
-import woowacourse.chatting.domain.RefreshToken;
+import woowacourse.chatting.domain.auth.RefreshToken;
+import woowacourse.chatting.domain.member.Member;
 import woowacourse.chatting.exception.jwt.JwtValidationException;
 import woowacourse.chatting.service.MemberService;
 import woowacourse.chatting.service.RefreshTokeService;
+import woowacourse.chatting.util.UUIDUtil;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static woowacourse.chatting.jwt.JwtRole.GRANT_TYPE;
@@ -31,19 +34,16 @@ import static woowacourse.chatting.jwt.JwtRole.GRANT_TYPE;
 public class JwtTokenProvider {
 
     private final Key key;
-    private final UserDetailsService userDetailsService;
     private final RefreshTokeService refreshTokeService;
     private final MemberService memberService;
 
     /**
-     * @param secretKey:         @Value("$jwt.secret")는 .yml에 저장 되어있는 key를 주입한다.
-     * @param userDetailsService : Spring Security의 표준 인터페이스를 통해 사용자 로드 기능을 주입받습니다.
+     * @param secretKey: @Value("$jwt.secret")는 .yml에 저장 되어있는 key를 주입한다.
      */
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, UserDetailsService userDetailsService, RefreshTokeService refreshTokeService, MemberService memberService) {
+    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, RefreshTokeService refreshTokeService, MemberService memberService) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.refreshTokeService = refreshTokeService;
         this.key = Keys.hmacShaKeyFor(keyBytes);
-        this.userDetailsService = userDetailsService;
         this.memberService = memberService;
     }
 
@@ -83,26 +83,30 @@ public class JwtTokenProvider {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
-        // 2. 토큰의 Subject 이메일 추출
-        String username = claims.getSubject();
+        // 2. 토큰에서 UUID 추출
+        UUID subId = UUID.fromString(claims.getSubject());
 
-        // 3. UserDetailsService를 통해 DB/캐시에서 실제 Member 객체를 로드 (Principal)
-        UserDetails principal = userDetailsService.loadUserByUsername(username);
+        // 3. JWT에 담긴 권한 정보를 List<GrantedAuthority>로 변환
+        String authString = claims.get("auth", String.class);
+        List<GrantedAuthority> authorities = Arrays.stream(authString.split(","))
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
 
-        // 4. Member 객체의 권한 목록을 사용하여 Authentication 객체 생성
+        // 4. Authentication 객체 생성 (DB 조회 없이)
         return new UsernamePasswordAuthenticationToken(
-                principal,
+                subId,
                 "",
-                principal.getAuthorities()
+                authorities       // JWT에서 가져온 권한
         );
     }
 
     public String reissueAccessToken(String refreshToken) {
 
-        Long memberId = getMemberIdFromRefreshToken(refreshToken);
+        String uuid = getMemberIdFromRefreshToken(refreshToken);
 
-        Member member = memberService.findMember(memberId);
-        RefreshToken findToken = refreshTokeService.findRefreshToken(memberId);
+        UUID subId = UUIDUtil.toUUID(uuid);
+        Member member = memberService.findBySubId(subId);
+        RefreshToken findToken = refreshTokeService.findRefreshToken(member.getId());
         if (!findToken.getToken().equals(refreshToken)) {
             throw new JwtValidationException("리프레시 토큰이 일치하지 않습니다");
         }
@@ -141,7 +145,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public Long getMemberIdFromRefreshToken(String refreshToken) {
+    public String getMemberIdFromRefreshToken(String refreshToken) {
 
         validateToken(refreshToken);
 
@@ -151,7 +155,7 @@ public class JwtTokenProvider {
                 .parseSignedClaims(refreshToken)
                 .getPayload();
 
-        return Long.valueOf(claims.getSubject());
+        return claims.getSubject();
     }
 
     private Claims parseClaims(String accessToken) {
@@ -180,10 +184,10 @@ public class JwtTokenProvider {
 
     private String getAccessToken(Member member, String authorities) {
         return Jwts.builder()
-                .subject(member.getEmail())
+                .subject(member.getSubId().toString())
                 .claim("auth", authorities)
-                .claim("memberId", member.getId())
-                .claim("name", member.getName())
+                .claim("username", member.getName())
+                .claim("email", member.getEmail())
                 .expiration(new Date(getNow() + 86400000))
                 .signWith(key)
                 .compact();
@@ -192,7 +196,7 @@ public class JwtTokenProvider {
     private String getRefreshToken(Member member) {
         return Jwts.builder()
                 .expiration(new Date(getNow() + 86400000))
-                .subject(String.valueOf(member.getId()))
+                .subject(member.getSubId().toString())
                 .signWith(key)
                 .compact();
     }

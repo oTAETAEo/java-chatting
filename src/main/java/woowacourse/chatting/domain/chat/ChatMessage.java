@@ -1,8 +1,9 @@
-package woowacourse.chatting.domain.message;
+package woowacourse.chatting.domain.chat;
 
 import jakarta.persistence.*;
 import lombok.*;
 import woowacourse.chatting.domain.BaseEntity;
+import woowacourse.chatting.domain.member.Member;
 
 @Entity
 @Getter
@@ -20,7 +21,10 @@ public class ChatMessage extends BaseEntity {
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;       // 어떤 채팅방의 메시지인지
 
-    private String sender;       // 보낸 사람
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member sender;       // 보낸 사람
+
     private String content;      // 메시지 본문
 
     @Enumerated(EnumType.STRING)

@@ -1,4 +1,4 @@
-package woowacourse.chatting.domain;
+package woowacourse.chatting.domain.member;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,8 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Getter
@@ -23,6 +22,9 @@ public class Member implements UserDetails {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    private UUID subId;
+
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
@@ -31,11 +33,20 @@ public class Member implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    // 내가 요청한 친구 요청 목록
+    @OneToMany(mappedBy = "from")
+    private Set<FriendRelation> sentFriendRequests = new LinkedHashSet<>();
+
+    // 내가 받은 친구 요청 목록
+    @OneToMany(mappedBy = "to")
+    private Set<FriendRelation> receivedFriendRequests = new LinkedHashSet<>();
+
     @Builder
     public Member(String email, String name, String password) {
         this.email = email;
         this.name = name;
         this.password = password;
+        this.subId = UUID.randomUUID();
     }
 
     @Override

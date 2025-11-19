@@ -55,8 +55,10 @@ async function fetchWithAuth(url, options) {
         console.log("[Auth] 401 Unauthorized. 토큰 재발급을 시도합니다.");
 
         try {
-            const refreshResponse = await fetch('/jwt/refresh', { method: 'GET' });
-            if (!refreshResponse.ok) { throw new Error('토큰 재발급에 실패했습니다.'); }
+            const refreshResponse = await fetch('/jwt/refresh', {method: 'GET'});
+            if (!refreshResponse.ok) {
+                throw new Error('토큰 재발급에 실패했습니다.');
+            }
 
             const tokenData = await refreshResponse.json();
             const newAccessToken = tokenData.accessToken;

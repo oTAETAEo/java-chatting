@@ -20,6 +20,7 @@ import woowacourse.chatting.jwt.JwtTokenProvider;
 import woowacourse.chatting.jwt.filter.JwtAuthenticationFilter;
 import woowacourse.chatting.jwt.filter.JwtLogoutFilter;
 import woowacourse.chatting.repository.RefreshTokeRepository;
+import woowacourse.chatting.service.MemberService;
 
 @Configuration
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final RefreshTokeRepository refreshTokeRepository;
     private final ObjectMapper objectMapper;
+    private final MemberService memberService;
 
     /**
      * Spring Security의 Filter Chain을 설정하고 반환합니다.
@@ -44,7 +46,7 @@ public class SecurityConfig {
 
                 // logoutFilter 비활성화.
                 .logout(AbstractHttpConfigurer::disable)
-                .addFilterBefore(new JwtLogoutFilter(refreshTokeRepository, jwtTokenProvider, objectMapper), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtLogoutFilter(refreshTokeRepository, jwtTokenProvider, memberService, objectMapper), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), LogoutFilter.class)
 
                 // 세션 관리 정책 설정

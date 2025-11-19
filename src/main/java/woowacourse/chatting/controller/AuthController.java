@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import woowacourse.chatting.dto.AddMemberRequest;
 import woowacourse.chatting.dto.ResponseDto;
-import woowacourse.chatting.dto.ResponseToken;
-import woowacourse.chatting.dto.SignInDto;
+import woowacourse.chatting.dto.auth.SignInDto;
+import woowacourse.chatting.dto.auth.SignResponse;
 import woowacourse.chatting.jwt.JwtToken;
 import woowacourse.chatting.service.AuthService;
 import woowacourse.chatting.service.MemberServiceImp;
@@ -31,7 +31,7 @@ public class AuthController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<ResponseToken> singIn(@RequestBody SignInDto signInDto, HttpServletResponse response) {
+    public ResponseEntity<SignResponse> singIn(@RequestBody SignInDto signInDto, HttpServletResponse response) {
         JwtToken jwtToken = authService.singIn(signInDto);
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", jwtToken.getRefreshToken())
@@ -44,8 +44,8 @@ public class AuthController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-        return ResponseEntity.ok(
-                ResponseToken.builder()
+        return ResponseEntity.ok().body(
+                SignResponse.builder()
                         .grantType(jwtToken.getGrantType())
                         .accessToken(jwtToken.getAccessToken())
                         .build()

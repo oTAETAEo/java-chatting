@@ -6,23 +6,19 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import woowacourse.chatting.ChatRoomCache;
-import woowacourse.chatting.domain.Member;
-import woowacourse.chatting.domain.message.ChatMessage;
-import woowacourse.chatting.domain.message.ChatRoom;
-import woowacourse.chatting.domain.message.MessageType;
-import woowacourse.chatting.dto.message.ChatMessageDto;
-import woowacourse.chatting.dto.message.PrivateMessageDto;
-import woowacourse.chatting.repository.message.ChatMessageRepository;
-import woowacourse.chatting.repository.message.ChatRoomRepository;
+import woowacourse.chatting.domain.chat.ChatRoom;
+import woowacourse.chatting.domain.member.Member;
+import woowacourse.chatting.dto.chat.ChatMessageDto;
+import woowacourse.chatting.dto.chat.MessageResponse;
+import woowacourse.chatting.dto.chat.RoomIdResponse;
+import woowacourse.chatting.service.chat.ChatRoomMemberService;
+import woowacourse.chatting.service.chat.ChatRoomService;
+import woowacourse.chatting.service.chat.ChatService;
 import woowacourse.chatting.service.webSocket.ConnectedUserService;
 
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -30,81 +26,73 @@ import java.util.UUID;
 @Controller
 public class ChatController {
 
-    // SimpMessagingTemplate: STOMP 메시지 브로커를 통해 클라이언트에게 메시지를 전달하는 도구
     private final SimpMessagingTemplate messagingTemplate;
     private final ConnectedUserService connectedUserService;
 
-    private final ChatRoomRepository chatRoomRepository;
-    private final ChatMessageRepository chatMessageRepository;
-    private final ChatRoomCache chatRoomCache;
+    private final ChatService chatService;
+    private final ChatRoomService chatRoomService;
+    private final ChatRoomMemberService chatRoomMemberService;
 
     // 공개방. (소규모 Save로 처리 가능)소규모: 그냥 save()도 충분
     // 중규모: @Async + 배치 저장
     // 대규모: Redis 캐싱 → 배치 저장 + 파티션 DB
     @MessageMapping("/public")
-    public void sendMessage(ChatMessageDto messageDto, Principal principal) {
+    public void sendMessage(SimpMessageHeaderAccessor accessor, ChatMessageDto messageDto) {
 
-        ChatRoom publicRoom = chatRoomCache.getPublicRoom();
+        ChatRoom publicChatRoom = chatRoomService.getPublicChatRoom();
 
-        if (principal instanceof Authentication auth && auth.getPrincipal() instanceof Member member) {
-            String sender = member.getName();
-            messageDto.setSender(sender);
+        String sessionId = accessor.getSessionId();
+        Member member = connectedUserService.getMember(sessionId);
+        chatService.chatMessageSave(publicChatRoom, messageDto, member);
 
-            ChatMessage message = ChatMessage.builder()
-                    .chatRoom(publicRoom) // 공개방 설정
-                    .content(messageDto.getContent())
-                    .sender(sender)
-                    .type(MessageType.TEXT)
-                    .build();
+        MessageResponse response = MessageResponse.builder()
+                .sender(member.getName())
+                .content(messageDto.getContent())
+                .build();
 
-            chatMessageRepository.save(message);
-        }
-
-        messagingTemplate.convertAndSend("/topic/public/" + publicRoom.getId(), messageDto);
-    }
-
-
-    @MessageMapping("/chat.getPublicRoom")
-    public void sendPublicRoomId(SimpMessageHeaderAccessor headerAccessor) {
-        ChatRoom publicRoom = chatRoomCache.getPublicRoom();
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("roomId", publicRoom.getId());
-
-        messagingTemplate.convertAndSendToUser(
-                headerAccessor.getUser().getName(),
-                "/queue/public-room",
-                payload
-        );
+        messagingTemplate.convertAndSend("/topic/public/" + publicChatRoom.getId(), response);
     }
 
     @MessageMapping("/private/{roomId}")
-    public void oneToOneMessage(PrivateMessageDto message, @DestinationVariable String roomId) {
+    public void oneToOneMessage(SimpMessageHeaderAccessor accessor, @DestinationVariable UUID roomId, ChatMessageDto messageDto) {
 
-        ChatRoom chatRoom = chatRoomRepository.findById(UUID.fromString(roomId)).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 입니다."));
+        ChatRoom chatRoom = chatRoomService.findChatRoom(roomId);
 
-        ChatMessage chatMessage = ChatMessage.builder()
-                .sender(message.getSender())
-                .chatRoom(chatRoom)
-                .content(message.getContent())
-                .type(MessageType.PRIVATE)
+        String sessionId = accessor.getSessionId();
+        Member member = connectedUserService.getMember(sessionId);
+
+        chatService.chatMessageSave(chatRoom, messageDto, member);
+
+        // recipient = 서버가 ChatRoomMember 조회 후 결정
+        Member recipient = chatRoomMemberService.getMembers(chatRoom)
+                .stream()
+                .filter(m -> !Objects.equals(m.getId(), member.getId()))
+                .findFirst()
+                .orElseThrow();
+
+        MessageResponse response = MessageResponse.builder()
+                .sender(member.getName())
+                .content(messageDto.getContent())
                 .build();
-        chatMessageRepository.save(chatMessage);
 
-        log.info("개인 메시지가 들어왔습니다. ");
         messagingTemplate.convertAndSendToUser(
-                message.getRecipient(),             // 받는 사람
-                "/queue/messages",                  // 구독 경로
-                message                             // payload
+                recipient.getSubId().toString(),
+                "/queue/messages",
+                response
         );
     }
 
-    @MessageMapping("/chat.getUsers")
-    public void getUsers() {
-        // 현재 접속자 목록 조회
-        List<String> users = connectedUserService.getConnectedUsernames();
+    @MessageMapping("/chat.getPublicRoom")
+    public void sendPublicRoomId(Principal principal) {
 
-        // 요청한 사용자에게만 전송
-        messagingTemplate.convertAndSend("/topic/users", users);
+        ChatRoom publicChatRoom = chatRoomService.getPublicChatRoom();
+        RoomIdResponse roomIdResponse = new RoomIdResponse(publicChatRoom.getId());
+
+        messagingTemplate.convertAndSendToUser(
+                principal.getName(),
+                "/queue/public-room",
+                roomIdResponse
+        );
     }
 
 }

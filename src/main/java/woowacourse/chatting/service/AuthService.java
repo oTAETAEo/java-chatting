@@ -6,7 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import woowacourse.chatting.dto.SignInDto;
+import woowacourse.chatting.dto.auth.SignInDto;
 import woowacourse.chatting.jwt.JwtToken;
 import woowacourse.chatting.jwt.JwtTokenProvider;
 

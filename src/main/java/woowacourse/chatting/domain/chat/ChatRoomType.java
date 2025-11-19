@@ -1,4 +1,4 @@
-package woowacourse.chatting.domain.message;
+package woowacourse.chatting.domain.chat;
 
 public enum ChatRoomType {
     PRIVATE,  // 1:1 채팅
